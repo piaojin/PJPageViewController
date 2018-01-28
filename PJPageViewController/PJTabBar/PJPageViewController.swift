@@ -35,6 +35,8 @@ open class PJPageViewController: UIViewController {
             
             self.pjTabBarView.sectionInset = tabBarViewConfiguration.sectionInset
             
+            self.pjTabBarView.scrollBar.backgroundColor = tabBarViewConfiguration.scrollBarColor
+            
             self.pjTabBarView.titleSelectedColor = tabBarViewConfiguration.titleSelectedColor
             
             self.pjTabBarView.titleColor = tabBarViewConfiguration.titleColor
@@ -62,6 +64,7 @@ open class PJPageViewController: UIViewController {
     public lazy var pjTabBarView: PJTabBarView! = {
         let bar = PJTabBarView()
         bar.translatesAutoresizingMaskIntoConstraints = false
+        bar.delegate = self
         return bar
     }()
     
@@ -124,33 +127,65 @@ public extension PJPageViewController {
     
     private func initView() {
         
-        self.view.addSubview(self.pjTabBarView)
+        let backgroundView = UIView()
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundView.backgroundColor = .white
+        self.view.addSubview(backgroundView)
         
-        pjTabBarView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        pjTabBarView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        pjTabBarView.heightAnchor.constraint(equalToConstant: self.tabBarViewConfiguration.tabBarViewHeigth).isActive = true
+        backgroundView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        backgroundView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        backgroundView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        backgroundView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        
         if #available(iOS 11.0, *) {
-            pjTabBarView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+            backgroundView.topAnchor.constraint(equalTo: backgroundView.safeAreaLayoutGuide.topAnchor).isActive = true
+            backgroundView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         } else {
-            pjTabBarView.topAnchor.constraint(equalTo: self.topLayoutGuide.topAnchor).isActive = true
+            backgroundView.topAnchor.constraint(equalTo: self.topLayoutGuide.topAnchor).isActive = true
+            backgroundView.bottomAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         }
+        
+//        self.view.addSubview(self.pjTabBarView)
+//
+//        pjTabBarView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+//        pjTabBarView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+//        pjTabBarView.heightAnchor.constraint(equalToConstant: self.tabBarViewConfiguration.tabBarViewHeigth).isActive = true
+//        if #available(iOS 11.0, *) {
+//            pjTabBarView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+//        } else {
+//            pjTabBarView.topAnchor.constraint(equalTo: self.topLayoutGuide.topAnchor).isActive = true
+//        }
+//
+//        self.addChildViewController(self.pageViewController)
+//        self.pageViewController.didMove(toParentViewController: self)
+//        self.view.addSubview(self.pageViewController.view)
+//        self.pageViewController.view.topAnchor.constraint(equalTo: self.pjTabBarView.bottomAnchor).isActive = true
+//        self.pageViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+//        self.pageViewController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+//        if #available(iOS 11.0, *) {
+//            self.pageViewController.view.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+//        } else {
+//            self.pageViewController.view.bottomAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
+//        }
+//        self.syncScrollView()
+        
+        backgroundView.addSubview(self.pjTabBarView)
+        
+        pjTabBarView.topAnchor.constraint(equalTo: backgroundView.topAnchor).isActive = true
+        pjTabBarView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor).isActive = true
+        pjTabBarView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor).isActive = true
+        pjTabBarView.heightAnchor.constraint(equalToConstant: self.tabBarViewConfiguration.tabBarViewHeigth).isActive = true
         
         self.addChildViewController(self.pageViewController)
         self.pageViewController.didMove(toParentViewController: self)
-        self.view.addSubview(self.pageViewController.view)
+        backgroundView.addSubview(self.pageViewController.view)
         self.pageViewController.view.topAnchor.constraint(equalTo: self.pjTabBarView.bottomAnchor).isActive = true
-        self.pageViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        self.pageViewController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        if #available(iOS 11.0, *) {
-            self.pageViewController.view.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        } else {
-            self.pageViewController.view.bottomAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
-        }
-        self.syncScrollView()
+        self.pageViewController.view.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor).isActive = true
+        self.pageViewController.view.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor).isActive = true
+        self.pageViewController.view.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor).isActive = true
     }
     
     private func initData() {
-        self.pjTabBarView.delegate = self
         if let first = viewControllers.first {
             self.pageViewController.setViewControllers([first], direction: .forward, animated: true, completion: nil)
         }

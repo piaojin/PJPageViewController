@@ -9,72 +9,31 @@
 import UIKit
 
 public struct PJTabBarViewConfiguration {
-    public var tabBarViewHeigth: CGFloat = 30.0 {
-        didSet {
-            
-        }
-    }
     
-    public var scrollBarHeigth: CGFloat = 2.0 {
-        didSet {
-            
-        }
-    }
+    public var tabBarViewHeigth: CGFloat = 30.0
     
-    public var minimumInteritemSpacing: CGFloat = 60.0 {
-        didSet {
-            
-        }
-    }
+    public var scrollBarColor: UIColor = .blue
     
-    public var minimumLineSpacing: CGFloat = 60.0 {
-        didSet {
-            
-        }
-    }
+    public var scrollBarHeigth: CGFloat = 2.0
+    
+    public var minimumInteritemSpacing: CGFloat = 60.0
+    
+    public var minimumLineSpacing: CGFloat = 60.0
     
     /// the size of cell
-    public var itemSize: CGSize = CGSize.zero {
-        didSet {
-            
-        }
-    }
+    public var itemSize: CGSize = CGSize.zero
     
-    public var sectionInset: UIEdgeInsets = UIEdgeInsets.zero {
-        didSet {
-            
-        }
-    }
+    public var sectionInset: UIEdgeInsets = UIEdgeInsets.zero
     
-    public var titleSelectedColor: UIColor = .blue {
-        didSet {
-            
-        }
-    }
+    public var titleSelectedColor: UIColor = .blue
     
-    public var titleColor: UIColor = .black {
-        didSet {
-            
-        }
-    }
+    public var titleColor: UIColor = .black
     
-    public var titleAlpha: CGFloat = 0.4 {
-        didSet {
-            
-        }
-    }
+    public var titleAlpha: CGFloat = 0.4
     
-    public var titleSelectedAlpha: CGFloat = 1.0 {
-        didSet {
-            
-        }
-    }
+    public var titleSelectedAlpha: CGFloat = 1.0
     
-    public var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium) {
-        didSet {
-            
-        }
-    }
+    public var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium)
     
     public var maxItemWidth: CGFloat = 0.0
     
