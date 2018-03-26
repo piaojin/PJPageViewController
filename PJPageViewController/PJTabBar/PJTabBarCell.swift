@@ -17,7 +17,6 @@ open class PJTabBarCell: UICollectionViewCell {
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.backgroundColor = .white
         label.textAlignment = .center
         return label
     }()
@@ -48,7 +47,6 @@ open class PJTabBarCell: UICollectionViewCell {
 public extension PJTabBarCell {
     
     func initView() {
-        self.contentView.backgroundColor = .yellow
         self.contentView.addSubview(self.titleLabel)
         self.titleLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
         self.titleLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
@@ -63,6 +61,7 @@ public extension PJTabBarCell {
         titleLabel.text = pjTabBarItem.title
         self.titleLeadingAnchor?.constant = self.pjTabBarItem.tabBarOptions.leftPadding
         self.titleTrailingAnchor?.constant = -self.pjTabBarItem.tabBarOptions.rightPadding
+        self.layoutIfNeeded()
     }
     
     func setSelected(selected: Bool) {
@@ -84,10 +83,6 @@ public extension PJTabBarCell {
     
     func setTitle(title: String) {
         updateTitle()
-    }
-    
-    func setTextAlignment(textAlignment: NSTextAlignment) {
-        titleLabel.textAlignment = textAlignment
     }
 }
 

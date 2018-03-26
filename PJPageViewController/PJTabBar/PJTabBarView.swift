@@ -164,12 +164,6 @@ open class PJTabBarView: UIView {
                     self.items[currentIndex] = tabBarItem
                 }
                 
-                for i in 0..<delegate!.pjTabBarNumberOfItems() {
-                    let tabBarItem = PJTabBarItem(title: delegate?.pjTabBar(self, pjTabBarItemAt: i))
-                    tabBarItem.isSelect = i == currentIndex
-                    self.items[i] = tabBarItem
-                }
-                
                 collectionView?.reloadData()
             }
         }
@@ -259,7 +253,6 @@ open class PJTabBarView: UIView {
     private func initData() {
         self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: &self.kPJTabBarViewContext)
         self.collectionView.addObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath, options: [.new, .old], context: &self.kCollectionViewContext)
-//        self.collectionView.visibleCells
     }
     
     private func setMinimumLineSpacing() {
@@ -316,8 +309,11 @@ open class PJTabBarView: UIView {
             // set default current index if current index is more 0
             if self.collectionView.contentSize != .zero {
                 self.collectionView.removeObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath)
-                if self.currentIndex > 0 {
-                    self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+                if let delegate = self.delegate {
+                    if self.currentIndex > 0, self.currentIndex <= delegate.pjTabBarNumberOfItems() - 1 {
+                        self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+                        self.setUpScrollBarPosition(atIndex: self.currentIndex)
+                    }
                 }
             }
         }
@@ -340,11 +336,10 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     public func configCell(cell: PJTabBarCell, indexPath: IndexPath) {
-        let pjTabBarItem = self.items[indexPath.row]
-        pjTabBarItem?.tabBarOptions = self.tabBarOptions
-        if let tabBarItem = pjTabBarItem {
-            cell.pjTabBarItem = tabBarItem
-        }
+        let pjTabBarItem = self.itemAt(index: indexPath.row)
+        pjTabBarItem.tabBarOptions = self.tabBarOptions
+        cell.pjTabBarItem = pjTabBarItem
+        self.items[indexPath.row] = pjTabBarItem
         
         if indexPath.row == currentIndex {
             self.setUpScrollBarPosition(atIndex: currentIndex)
@@ -371,9 +366,12 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
         }
         
         if let pjTabBarItem = self.items[sizeForItemAtIndexPath.row] {
-            if pjTabBarItem.cellSize == .zero || self.tabBarOptions.maxItemWidth > 0 {
+            if pjTabBarItem.cellSize.width == 0.0 || pjTabBarItem.cellSize.height == 0.0 || self.tabBarOptions.maxItemWidth > 0 {
                 pjTabBarItem.cellSize = sizeForItem(title: title)
             }
+//            if pjTabBarItem.cellSize == .zero || self.tabBarOptions.maxItemWidth > 0 {
+//                pjTabBarItem.cellSize = sizeForItem(title: title)
+//            }
             return pjTabBarItem.cellSize
         } else {
             // first time load sizeForItem
@@ -384,6 +382,20 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
             pjTabBarItem.cellSize = sizeForItem(title: title)
             self.items[sizeForItemAtIndexPath.row] = pjTabBarItem
             return pjTabBarItem.cellSize
+        }
+    }
+    
+    private func itemAt(index: Int) -> PJTabBarItem {
+        if let pjTabBarItem = self.items[index] {
+            return pjTabBarItem
+        } else {
+            // first time load PJTabBarItem
+            let title = self.delegate?.pjTabBar(self, pjTabBarItemAt: index)
+            let pjTabBarItem = PJTabBarItem(title: title)
+            if currentIndex == index {
+                pjTabBarItem.isSelect = true
+            }
+            return pjTabBarItem
         }
     }
 }

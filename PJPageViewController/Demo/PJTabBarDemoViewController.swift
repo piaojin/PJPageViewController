@@ -20,7 +20,7 @@ class PJTabBarDemoViewController: UIViewController {
         viewController2.view.backgroundColor = .red
         
         let viewController3 = DemoTableViewController()
-        viewController3.title = "viewController3"
+        viewController3.title = "viewController3$"
         viewController3.view.backgroundColor = .yellow
         
         let viewController4 = DemoTableViewController()
@@ -38,11 +38,11 @@ class PJTabBarDemoViewController: UIViewController {
         tabBarViewConfiguration.leftPadding = 10.0
         tabBarViewConfiguration.rightPadding = 10.0
         tabBarViewConfiguration.scrollBarColor = .yellow
-        tabBarViewConfiguration.maxItemWidth = 100.0
+//        tabBarViewConfiguration.maxItemWidth = 100.0
         tabBarViewConfiguration.scrollBarHeigth = 6.0
         tabBarViewConfiguration.titleColor = .red
-        tabBarViewConfiguration.titleSelectedColor = .black
-//        tabBarViewConfiguration.autoSetMinimumLineSpacingMaxCount = 2
+        tabBarViewConfiguration.titleSelectedColor = .blue
+        tabBarViewConfiguration.autoSetMinimumLineSpacingMaxCount = 3
 //        tabBarViewConfiguration.minimumLineSpacing = 100.0
         tabBarViewConfiguration.isAutoSetMinimumLineSpacing = false
 //        tabBarViewConfiguration.minimumInteritemSpacing = 100.0
@@ -65,7 +65,7 @@ class PJTabBarDemoViewController: UIViewController {
         let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
 //        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
         viewController.tabBarViewHeigth = 30.0
-//        viewController.currentIndex = 3
+        viewController.currentIndex = 3
         
         //不带coverView
 //        let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)

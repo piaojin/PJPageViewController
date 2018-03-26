@@ -96,16 +96,7 @@ open class PJPageViewController: UIViewController {
     
     public weak var pageScrollView: UIScrollView!
     
-    public var viewControllers: [UIViewController] = [] {
-        didSet {
-            if let first = viewControllers.first {
-                self.pageViewController.setViewControllers([first], direction: .forward, animated: self.pageAnimated, completion: {
-                    [weak self] (finished) in
-                    self?.pageCompletion?(finished, 0)
-                })
-            }
-        }
-    }
+    public var viewControllers: [UIViewController] = []
     
     public var titles: [String] = []
     
@@ -203,10 +194,9 @@ public extension PJPageViewController {
             [weak self] (finished) in
             if let `self` = self {
                 self.pageCompletion?(finished, 0)
+                self.pjTabBarView.currentIndex = self.currentIndex
             }
         })
-
-        self.pjTabBarView.currentIndex = self.currentIndex
     }
     
     public func syncScrollView() {

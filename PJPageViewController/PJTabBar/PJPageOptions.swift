@@ -29,9 +29,9 @@ public struct PJPageOptions {
     
     public var rightPadding: CGFloat = 0.0
     
-    public var titleSelectedColor: UIColor = .blue
+    public var titleSelectedColor: UIColor = .black
     
-    public var titleColor: UIColor = .black
+    public var titleColor: UIColor = .white
     
     public var cellSelectedColor: UIColor = .clear
     
