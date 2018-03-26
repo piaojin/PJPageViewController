@@ -18,6 +18,7 @@ open class PJTabBarCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.backgroundColor = .white
+        label.textAlignment = .center
         return label
     }()
     

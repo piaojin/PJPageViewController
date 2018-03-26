@@ -46,10 +46,9 @@ class PJTabBarDemoViewController: UIViewController {
 //        tabBarViewConfiguration.minimumLineSpacing = 100.0
         tabBarViewConfiguration.isAutoSetMinimumLineSpacing = false
 //        tabBarViewConfiguration.minimumInteritemSpacing = 100.0
-//        tabBarViewConfiguration.leftPadding = 20.0
-//        tabBarViewConfiguration.rightPadding = 10.0
-//        tabBarViewConfiguration.titleTextAlignment = .right
-//        tabBarViewConfiguration.itemSize = CGSize(width: 300.0, height: 30.0)
+        tabBarViewConfiguration.leftPadding = 20.0
+        tabBarViewConfiguration.rightPadding = 10.0
+//        tabBarViewConfiguration.itemSize = CGSize(width: 60.0, height: 30.0)
         
         let viewController5 = TestViewController()
         viewController5.title = "viewController5"

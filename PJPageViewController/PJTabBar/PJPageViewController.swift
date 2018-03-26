@@ -80,14 +80,10 @@ open class PJPageViewController: UIViewController {
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
         bar.delegate = self
-//        bar.finishedLayoutClosure = { [weak self] (tabBarView) in
-//            if let `self` = self {
-//                tabBarView.currentIndex = self.currentIndex
-////                tabBarView.reloadData()
-////                self.pjTabBarView.delegate = self
-//                tabBarView.scrollToItem(at: self.currentIndex)
-//            }
-//        }
+        bar.clickCellClosure = {
+            [weak self] (tabBarView, index) in
+            self?.isClickTabBarView = true
+        }
         return bar
     }()
     

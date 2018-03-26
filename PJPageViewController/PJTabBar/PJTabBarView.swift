@@ -23,7 +23,7 @@ open class PJTabBarView: UIView {
     
     private static let kPJTabBarViewWidthKeyPath = "frame"
     
-    open var finishedLayoutClosure: ((PJTabBarView) -> ())?
+    open var clickCellClosure: ((PJTabBarView, Int) -> ())?
     
     private var lastWidth: CGFloat = 0.0
     
@@ -321,12 +321,6 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PJTabBarView.kPJTabBarIdentifier, for: indexPath) as? PJTabBarCell
         configCell(cell: cell!, indexPath: indexPath)
-//        if indexPath.row == self.currentIndex {
-//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: {
-////                self.scrollBar.frame.origin.y = collectionView.frame.size.height - self.scrollBar.frame.size.height
-//                self.scrollToItem(at: indexPath.row)
-//            })
-//        }
         return cell!
     }
     
@@ -336,11 +330,6 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
         if let tabBarItem = pjTabBarItem {
             cell.pjTabBarItem = tabBarItem
         }
-        if let textAlignment = pjTabBarItem?.tabBarOptions.titleTextAlignment {
-            cell.setTextAlignment(textAlignment: textAlignment)
-        } else {
-            cell.setTextAlignment(textAlignment: .center)
-        }
         
         if indexPath.row == currentIndex {
             self.setUpScrollBarPosition(atIndex: currentIndex)
@@ -349,6 +338,16 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     
     public func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt sizeForItemAtIndexPath: IndexPath) -> CGSize {
         if self.tabBarOptions.itemSize != CGSize.zero {
+//            guard let title = delegate?.pjTabBar(self, pjTabBarItemAt: sizeForItemAtIndexPath.row) else {
+//                return self.tabBarOptions.itemSize
+//            }
+//            // first time load sizeForItem
+//            let pjTabBarItem = PJTabBarItem(title: title)
+//            if currentIndex == sizeForItemAtIndexPath.row {
+//                pjTabBarItem.isSelect = true
+//            }
+//            pjTabBarItem.cellSize = self.tabBarOptions.itemSize
+//            self.items[sizeForItemAtIndexPath.row] = pjTabBarItem
             return self.tabBarOptions.itemSize
         }
         
@@ -372,21 +371,12 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
             return pjTabBarItem.cellSize
         }
     }
-    
-//    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        if indexPath.row == collectionView.indexPathsForVisibleItems.last?.row {
-//             self.finishedLayoutClosure?(self)
-//        } else {
-//            collectionView.reloadItems(at: [IndexPath(row: self.currentIndex, section: 0)])
-//            collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
-//            self.setUpScrollBarPosition(atIndex: self.currentIndex)
-//        }
-//    }
 }
 
 //MARK: UICollectionView UICollectionViewDelegate
 extension PJTabBarView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.clickCellClosure?(self, indexPath.row)
         self.delegate?.pjTabBarWillChange?(self, fromIndex: currentIndex, toIndex: indexPath.row)
         self.scrollToItem(at: indexPath.row, at: self.tabBarOptions.scrollPosition)
     }
@@ -513,17 +503,6 @@ public extension PJTabBarView {
         }
     }
     
-    public func setTextAlignment(textAlignment: NSTextAlignment, atIndex: Int) {
-        assert(delegate?.pjTabBarNumberOfItems() != nil && atIndex < (delegate?.pjTabBarNumberOfItems())!, "PJTabBar: atIndex out of bounds")
-        if let pjtarBarItem = self.items[atIndex] {
-            pjtarBarItem.tabBarOptions.titleTextAlignment = textAlignment
-            collectionView.reloadItems(at: [IndexPath(row: atIndex, section: 0)])
-            if currentIndex == atIndex {
-                setUpScrollBarPosition(atIndex: atIndex)
-            }
-        }
-    }
-    
     private func setUpScrollBarPosition(atIndex: Int) {
         if !self.tabBarOptions.isNeedScrollBar {
             return
@@ -538,25 +517,20 @@ public extension PJTabBarView {
             if self.tabBarOptions.scrollBarConstWidth != 0.0 {
                 scrollBarWidth = self.tabBarOptions.scrollBarConstWidth
             }
-            self.scrollBar.frame.size = CGSize(width: scrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding, height: self.tabBarOptions.scrollBarHeigth)
-            let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height
-            switch pjTabBarItem.tabBarOptions.titleTextAlignment {
-            case .left :
-                self.scrollBar.frame.origin = CGPoint(x: attr.frame.origin.x + self.tabBarOptions.leftPadding, y: scrollBarY)
-                break
-            case .right :
-                self.scrollBar.frame.origin = CGPoint(x: attr.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding, y: scrollBarY)
-                break
-            default :
-                let scrollBarCenterX = self.tabBarOptions.leftPadding + (attr.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
-                self.scrollBar.center = CGPoint(x: attr.frame.origin.x + scrollBarCenterX, y: scrollBarY)
-                break
+            scrollBarWidth = scrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding
+            if scrollBarWidth > attr.frame.size.width {
+                scrollBarWidth = attr.frame.size.width
             }
+            self.scrollBar.frame.size = CGSize(width: scrollBarWidth, height: self.tabBarOptions.scrollBarHeigth)
+            let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height
+            let scrollBarCenterX = self.tabBarOptions.leftPadding + (attr.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+            self.scrollBar.center = CGPoint(x: attr.frame.origin.x + scrollBarCenterX, y: scrollBarY)
         }
     }
     
     /// rolling scrollBar when switching
     public func moveScrollBar(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat) {
+        
         if !self.tabBarOptions.isNeedScrollBar {
             return
         }
@@ -609,29 +583,20 @@ public extension PJTabBarView {
             targetFrame.size.width = self.tabBarOptions.scrollBarConstWidth
         } else if self.tabBarOptions.maxItemWidth > 0, targetFrame.size.width > self.tabBarOptions.maxItemWidth {
             targetFrame.size.width = self.tabBarOptions.maxItemWidth
+        } else if targetFrame.size.width > toFrame.size.width {
+            targetFrame.size.width = toFrame.size.width
         }
         
-//        let toTabBarItem = toCell.pjTabBarItem
+        let toFrameCenterX = toFrame.origin.x + self.tabBarOptions.leftPadding + (toFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
         
-//        switch toTabBarItem.tabBarOptions.titleTextAlignment {
-//        case .left :
-////            self.scrollBar.frame.origin = CGPoint(x: toCell.frame.origin.x + self.tabBarOptions.leftPadding, y: self.scrollBar.frame.origin.y)
-//            targetFrame.origin.x += (toFrame.origin.x + self.tabBarOptions.leftPadding - fromFrame.origin.x) * progressPercentage
-//            break
-//        case .right :
-////            self.scrollBar.frame.origin = CGPoint(x: toCell.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding, y: self.scrollBar.frame.origin.y)
-//            targetFrame.origin.x += (toCell.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding - fromFrame.origin.x) * progressPercentage
-//            break
-//        default :
-////            let scrollBarCenterX = self.tabBarOptions.leftPadding + (toCell.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
-////            self.scrollBar.center = CGPoint(x: toCell.frame.origin.x + scrollBarCenterX, y: self.scrollBar.frame.origin.y)
-//            targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
-//            break
-//        }
+        let fromFrameCenterX = fromFrame.origin.x + self.tabBarOptions.leftPadding + (fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
         
-        targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
+        self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
+        self.scrollBar.frame.size.width = targetFrame.size.width
+        
+//        targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
 
-        self.scrollBar.frame = CGRect(x: targetFrame.origin.x, y: self.scrollBar.frame.origin.y, width: targetFrame.size.width, height: self.scrollBar.frame.size.height)
+//        self.scrollBar.frame = CGRect(x: targetFrame.origin.x, y: self.scrollBar.frame.origin.y, width: targetFrame.size.width, height: self.scrollBar.frame.size.height)
 
         var targetContentOffset: CGFloat = 0.0
         if self.collectionView.contentSize.width > self.frame.size.width {
@@ -645,36 +610,7 @@ public extension PJTabBarView {
     }
     
     private func contentOffsetForCell(withFrame cellFrame: CGRect, andIndex index: Int) -> CGFloat {
-        let sectionInset = self.flowLayout.sectionInset // swiftlint:disable:this force_cast
-
-        var alignmentOffset: CGFloat = 0.0
-
-        if let tabBarItem = self.items[index] {
-            switch tabBarItem.tabBarOptions.titleTextAlignment {
-            case .left:
-                alignmentOffset = sectionInset.left
-                break
-            case .right:
-                alignmentOffset = frame.size.width - sectionInset.right - cellFrame.size.width
-                break
-            case .center:
-                alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
-                break
-            default :
-                if let numberOfItems = self.collectionView.dataSource?.collectionView(self.collectionView, numberOfItemsInSection: 0) {
-                    let cellHalfWidth = cellFrame.size.width * 0.5
-                    let leftAlignmentOffset = sectionInset.left + cellHalfWidth
-                    let rightAlignmentOffset = frame.size.width - sectionInset.right - cellHalfWidth
-                    let progress = index / (numberOfItems - 1)
-                    alignmentOffset = leftAlignmentOffset + (rightAlignmentOffset - leftAlignmentOffset) * CGFloat(progress) - cellHalfWidth
-                } else {
-                    alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
-                }
-                break
-            }
-        } else {
-            alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
-        }
+        let alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
         var contentOffset = cellFrame.origin.x - alignmentOffset
         contentOffset = max(0, contentOffset)
         contentOffset = min(self.collectionView.contentSize.width - frame.size.width, contentOffset)

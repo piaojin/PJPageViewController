@@ -43,7 +43,8 @@ public struct PJPageOptions {
     
     public var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium)
     
-    public var titleTextAlignment: NSTextAlignment = .center
+    //Temporary dissupport
+//    public var titleTextAlignment: NSTextAlignment = .center
     
     public var maxItemWidth: CGFloat = 0.0
     
