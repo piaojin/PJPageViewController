@@ -22,6 +22,9 @@ import UIKit
 open class PJTabBarView: UIView {
     
     private static let kPJTabBarViewWidthKeyPath = "frame"
+    private static let kCollectionViewWidthKeyPath = "contentSize"
+    private var kPJTabBarViewContext = 0
+    private var kCollectionViewContext = 1
     
     open var clickCellClosure: ((PJTabBarView, Int) -> ())?
     
@@ -254,7 +257,9 @@ open class PJTabBarView: UIView {
     }
     
     private func initData() {
-        self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: nil)
+        self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: &self.kPJTabBarViewContext)
+        self.collectionView.addObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath, options: [.new, .old], context: &self.kCollectionViewContext)
+//        self.collectionView.visibleCells
     }
     
     private func setMinimumLineSpacing() {
@@ -297,13 +302,23 @@ open class PJTabBarView: UIView {
     
     deinit {
         self.removeObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath)
+        self.collectionView.removeObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath)
     }
     
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == PJTabBarView.kPJTabBarViewWidthKeyPath {
+        if keyPath == PJTabBarView.kPJTabBarViewWidthKeyPath, context == &self.kPJTabBarViewContext {
+            //auto set minimumLineSpacing(Rotating screen)
             if self.lastWidth != self.frame.size.width {
                 self.setMinimumLineSpacing()
                 self.lastWidth = self.frame.size.width
+            }
+        } else if keyPath == PJTabBarView.kCollectionViewWidthKeyPath, context == &self.kCollectionViewContext {
+            // set default current index if current index is more 0
+            if self.collectionView.contentSize != .zero {
+                self.collectionView.removeObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath)
+                if self.currentIndex > 0 {
+                    self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+                }
             }
         }
     }
@@ -338,16 +353,16 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     
     public func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt sizeForItemAtIndexPath: IndexPath) -> CGSize {
         if self.tabBarOptions.itemSize != CGSize.zero {
-//            guard let title = delegate?.pjTabBar(self, pjTabBarItemAt: sizeForItemAtIndexPath.row) else {
-//                return self.tabBarOptions.itemSize
-//            }
-//            // first time load sizeForItem
-//            let pjTabBarItem = PJTabBarItem(title: title)
-//            if currentIndex == sizeForItemAtIndexPath.row {
-//                pjTabBarItem.isSelect = true
-//            }
-//            pjTabBarItem.cellSize = self.tabBarOptions.itemSize
-//            self.items[sizeForItemAtIndexPath.row] = pjTabBarItem
+            guard let title = delegate?.pjTabBar(self, pjTabBarItemAt: sizeForItemAtIndexPath.row) else {
+                return self.tabBarOptions.itemSize
+            }
+            // first time load sizeForItem
+            let pjTabBarItem = PJTabBarItem(title: title)
+            if currentIndex == sizeForItemAtIndexPath.row {
+                pjTabBarItem.isSelect = true
+            }
+            pjTabBarItem.cellSize = self.tabBarOptions.itemSize
+            self.items[sizeForItemAtIndexPath.row] = pjTabBarItem
             return self.tabBarOptions.itemSize
         }
         
@@ -534,7 +549,6 @@ public extension PJTabBarView {
         if !self.tabBarOptions.isNeedScrollBar {
             return
         }
-//        self.currentIndex = progressPercentage > 0.5 ? toIndex : fromIndex
 
         let cells = cellForItems(at: [IndexPath(row: fromIndex, section: 0), IndexPath(row: toIndex, section: 0)], reloadIfNotVisible: true)
         
@@ -577,7 +591,6 @@ public extension PJTabBarView {
 
         var targetFrame = fromFrame
         targetFrame.size.height = self.scrollBar.frame.size.height
-        targetFrame.size.width += (toFrame.size.width - fromFrame.size.width) * progressPercentage
         
         if self.tabBarOptions.scrollBarConstWidth != 0.0 {
             targetFrame.size.width = self.tabBarOptions.scrollBarConstWidth
@@ -592,11 +605,10 @@ public extension PJTabBarView {
         let fromFrameCenterX = fromFrame.origin.x + self.tabBarOptions.leftPadding + (fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
         
         self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
-        self.scrollBar.frame.size.width = targetFrame.size.width
         
-//        targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
-
-//        self.scrollBar.frame = CGRect(x: targetFrame.origin.x, y: self.scrollBar.frame.origin.y, width: targetFrame.size.width, height: self.scrollBar.frame.size.height)
+        let scrollBarWidth = fromCell.pjTabBarItem.titleWidth + (toCell.pjTabBarItem.titleWidth - fromCell.pjTabBarItem.titleWidth) * progressPercentage
+        
+        self.scrollBar.frame.size.width = scrollBarWidth
 
         var targetContentOffset: CGFloat = 0.0
         if self.collectionView.contentSize.width > self.frame.size.width {

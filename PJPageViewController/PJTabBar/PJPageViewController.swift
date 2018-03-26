@@ -80,10 +80,6 @@ open class PJPageViewController: UIViewController {
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
         bar.delegate = self
-        bar.clickCellClosure = {
-            [weak self] (tabBarView, index) in
-            self?.isClickTabBarView = true
-        }
         return bar
     }()
     
@@ -116,9 +112,6 @@ open class PJPageViewController: UIViewController {
     public var currentIndex: Int = 0 {
         didSet {
             assert(currentIndex <= self.viewControllers.count - 1 && currentIndex >= 0 , "PJPageViewController: currentIndex out of bounds")
-//            if self.pjTabBarView.currentIndex != currentIndex {
-//                self.pjTabBarView.currentIndex = currentIndex
-//            }
         }
     }
     
@@ -253,12 +246,10 @@ extension PJPageViewController: UIScrollViewDelegate {
         print("fromIndex: \(fromIndex), toIndex: \(toIndex), progressPercentage: \(scrollPercentage), offsetX: \(scrollView.contentOffset.x), swipeDirection: \(swipeDirection), currentIndex: \(currentIndex)")
         
         if fromIndex == -1, toIndex == fromIndex {
-//            self.lastContentOffsetX = scrollView.contentOffset.x
             return
         }
         
         if (self.currentIndex == self.viewControllers.count - 1 && scrollView.contentOffset.x >= scrollView.frame.size.width) || (self.currentIndex == 0 && scrollView.contentOffset.x < scrollView.frame.size.width) {
-//            self.lastContentOffsetX = scrollView.contentOffset.x
             return
         }
         
@@ -269,7 +260,6 @@ extension PJPageViewController: UIScrollViewDelegate {
                 self.didFinishAnimating = false
             }
         }
-//        self.lastContentOffsetX = scrollView.contentOffset.x
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
