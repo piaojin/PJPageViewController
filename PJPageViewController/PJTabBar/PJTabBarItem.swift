@@ -10,11 +10,11 @@ import UIKit
 
 open class PJTabBarItem {
 
-    var title: String?
-    var cellSize: CGSize = CGSize.zero
-    var isSelect: Bool = false
-    var titleTextAlignment: NSTextAlignment = .center
-    init(title: String?) {
+    open var title: String? = ""
+    open var cellSize: CGSize = .zero
+    open var isSelect: Bool = false
+    open var tabBarOptions: PJPageOptions = PJPageOptions()
+    public init(title: String?) {
         self.title = title
     }
 }

@@ -11,6 +11,8 @@ import UIKit
 @objc public protocol PJTabBarViewDelegate: NSObjectProtocol {
     @objc optional func pjTabBarDidChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int)
     
+    @objc optional func pjTabBarWillChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int)
+    
     func pjTabBarNumberOfItems() -> Int
     
     func pjTabBar(_ pjTabBarView: PJTabBarView, pjTabBarItemAt index: Int) -> String
@@ -19,42 +21,54 @@ import UIKit
 @IBDesignable
 open class PJTabBarView: UIView {
     
-    var items: [Int : PJTabBarItem] = [:]
+    private static let kPJTabBarViewWidthKeyPath = "frame"
     
-    @IBInspectable var scrollBarHeigth: CGFloat = 2.0 {
+    open var finishedLayoutClosure: ((PJTabBarView) -> ())?
+    
+    private var lastWidth: CGFloat = 0.0
+    
+    open var items: [Int : PJTabBarItem] = [:]
+    
+    open var tabBarOptions: PJPageOptions = PJPageOptions()
+    
+    @IBInspectable open var scrollBarHeigth: CGFloat = 2.0 {
         didSet {
             if delegate != nil {
+                self.tabBarOptions.scrollBarHeigth = scrollBarHeigth
                 scrollBar.frame.size = CGSize(width: scrollBar.frame.size.width, height: scrollBarHeigth)
                 scrollBar.frame.origin = CGPoint(x: scrollBar.frame.origin.x, y: collectionView.frame.size.height - scrollBarHeigth)
             }
         }
     }
     
-    @IBInspectable var minimumInteritemSpacing: CGFloat = 60.0 {
+    @IBInspectable open var minimumInteritemSpacing: CGFloat = 60.0 {
         didSet {
             flowLayout.minimumInteritemSpacing = minimumInteritemSpacing
+            self.tabBarOptions.minimumInteritemSpacing = minimumInteritemSpacing
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
     
-    @IBInspectable var minimumLineSpacing: CGFloat = 60.0 {
+    @IBInspectable open var minimumLineSpacing: CGFloat = 60.0 {
         didSet {
             flowLayout.minimumLineSpacing = minimumLineSpacing
+            self.tabBarOptions.minimumLineSpacing = minimumLineSpacing
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
     
     /// the size of cell
-    @IBInspectable var itemSize: CGSize = CGSize.zero {
+    @IBInspectable open var itemSize: CGSize = CGSize.zero {
         didSet {
             flowLayout.itemSize = itemSize
+            self.tabBarOptions.itemSize = itemSize
             flowLayout.invalidateLayout()
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
     
     /// current select item index
-    var currentIndex: Int = 0 {
+    open var currentIndex: Int = 0 {
         didSet {
             guard delegate != nil, let count = delegate?.pjTabBarNumberOfItems(), currentIndex < count, currentIndex >= 0 else {
                 return
@@ -69,6 +83,10 @@ open class PJTabBarView: UIView {
             
             if let newTabBarItem = self.items[newIndex]  {
                 newTabBarItem.isSelect = true
+            } else {
+                let newTabBarItem = PJTabBarItem(title: delegate?.pjTabBar(self, pjTabBarItemAt: newIndex))
+                newTabBarItem.isSelect = true
+                self.items[newIndex] = newTabBarItem
             }
             
             if oldIndex < count, oldIndex >= 0 {
@@ -79,129 +97,215 @@ open class PJTabBarView: UIView {
             }
             
             collectionView?.reloadItems(at: [IndexPath(row: newIndex, section: 0)])
-            collectionView?.scrollToItem(at: IndexPath(row: newIndex, section: 0), at: scrollPosition, animated: true)
+            collectionView?.scrollToItem(at: IndexPath(row: newIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
             self.setUpScrollBarPosition(atIndex: newIndex)
         }
     }
     
-    @IBInspectable var sectionInset: UIEdgeInsets = UIEdgeInsets.zero {
+    @IBInspectable open var sectionInset: UIEdgeInsets = UIEdgeInsets.zero {
         didSet {
             flowLayout.sectionInset = sectionInset
+            self.tabBarOptions.sectionInset = sectionInset
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
     
-    @IBInspectable var titleSelectedColor: UIColor = .blue {
+    @IBInspectable open var titleSelectedColor: UIColor = .blue {
         didSet {
+            self.tabBarOptions.titleSelectedColor = titleSelectedColor
             collectionView?.reloadData()
         }
     }
     
-    @IBInspectable var titleColor: UIColor = .black {
+    @IBInspectable open var titleColor: UIColor = .black {
         didSet {
+            self.tabBarOptions.titleColor = titleColor
             collectionView?.reloadData()
         }
     }
     
-    @IBInspectable var titleAlpha: CGFloat = 0.4 {
+    @IBInspectable open var titleAlpha: CGFloat = 0.4 {
         didSet {
+            self.tabBarOptions.titleAlpha = titleAlpha
             collectionView?.reloadData()
         }
     }
     
-    @IBInspectable var titleSelectedAlpha: CGFloat = 1.0 {
+    @IBInspectable open var titleSelectedAlpha: CGFloat = 1.0 {
         didSet {
+            self.tabBarOptions.titleSelectedAlpha = titleSelectedAlpha
             collectionView?.reloadData()
         }
     }
     
-    @IBInspectable var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium) {
+    @IBInspectable open var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium) {
         didSet {
             for pjTabBarItem in self.items.values {
-                pjTabBarItem.cellSize = CGSize.zero
+                pjTabBarItem.cellSize = .zero
             }
+            self.tabBarOptions.titleFont = titleFont
             collectionView?.reloadData()
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
     
-    var maxItemWidth: CGFloat = 0.0
-    var scrollPosition: UICollectionViewScrollPosition = .centeredHorizontally
-    
-    weak var delegate: PJTabBarViewDelegate? {
+    open weak var delegate: PJTabBarViewDelegate? {
         didSet {
             if delegate != nil {
-                assert(delegate?.pjTabBarNumberOfItems() != nil && currentIndex <= (delegate?.pjTabBarNumberOfItems())! && currentIndex >= 0, "currentIndex out of bounds")
+                assert(delegate?.pjTabBarNumberOfItems() != nil && currentIndex <= (delegate?.pjTabBarNumberOfItems())! && currentIndex >= 0, "PJTabBar: currentIndex out of bounds")
+                if let tabBarItem = self.items[currentIndex] {
+                    tabBarItem.isSelect = true
+                } else {
+                    let tabBarItem = PJTabBarItem(title: delegate?.pjTabBar(self, pjTabBarItemAt: currentIndex))
+                    tabBarItem.isSelect = true
+                    self.items[currentIndex] = tabBarItem
+                }
+                
+                for i in 0..<delegate!.pjTabBarNumberOfItems() {
+                    let tabBarItem = PJTabBarItem(title: delegate?.pjTabBar(self, pjTabBarItemAt: i))
+                    tabBarItem.isSelect = i == currentIndex
+                    self.items[i] = tabBarItem
+                }
+                
                 collectionView?.reloadData()
             }
         }
     }
     
     private static let kPJTabBarIdentifier = "PJTabBarViewCell"
-    public var flowLayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout() {
+    open var flowLayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout() {
         didSet {
             self.collectionView.collectionViewLayout = flowLayout
             self.collectionView.collectionViewLayout.invalidateLayout()
             self.collectionView.reloadData()
         }
     }
-    @IBInspectable var collectionView: UICollectionView!
-    @IBInspectable var scrollBar: UIView!
+    @IBInspectable open var collectionView: UICollectionView!
+    @IBInspectable open var scrollBar: UIView!
     
     /// current select item source
-    var currentPhoneTabBarItem: PJTabBarItem?
+    open var currentPhoneTabBarItem: PJTabBarItem?
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        self.setUpSubViews()
+        self.initSubViews()
+        self.initData()
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.setUpSubViews()
+        self.initSubViews()
+        self.initData()
+    }
+    
+    public convenience init(frame: CGRect, tabBarOptions: PJPageOptions) {
+        self.init(frame: frame)
+        self.tabBarOptions = tabBarOptions
+        self.flowLayout.minimumLineSpacing = tabBarOptions.minimumLineSpacing
+        self.flowLayout.minimumInteritemSpacing = tabBarOptions.minimumInteritemSpacing
+    }
+    
+    public convenience init(tabBarOptions: PJPageOptions) {
+        self.init(frame: .zero)
+        self.tabBarOptions = tabBarOptions
+        self.flowLayout.minimumLineSpacing = tabBarOptions.minimumLineSpacing
+        self.flowLayout.minimumInteritemSpacing = tabBarOptions.minimumInteritemSpacing
+    }
+    
+    public convenience init() {
+        self.init(frame: .zero)
     }
     
     override open func awakeFromNib() {
         super.awakeFromNib()
+        self.initSubViews()
+        self.initData()
     }
     
     /// init subViews
-    private func setUpSubViews() {
+    private func initSubViews() {
         self.backgroundColor = .white
-        flowLayout.scrollDirection = UICollectionViewScrollDirection.horizontal
-        flowLayout.minimumLineSpacing = minimumLineSpacing
-        flowLayout.sectionInset = sectionInset
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.sectionInset = self.tabBarOptions.sectionInset
         
-        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        collectionView.register(PJTabBarViewCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
+        collectionView.register(PJTabBarCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = self.backgroundColor
         self.addSubview(collectionView)
         
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
-        scrollBar = UIView()
-        scrollBar.backgroundColor = .blue
+        if self.tabBarOptions.isNeedScrollBar {
+            scrollBar = UIView()
+            scrollBar.backgroundColor = self.tabBarOptions.scrollBarColor
+            collectionView.addSubview(scrollBar)
+        }
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.addSubview(scrollBar)
-        collectionView.accessibilityIdentifier = "tabs"
         collectionView.delegate = self
         collectionView.dataSource = self
     }
     
-    /// The number of calls is relatively small and acceptable.
-    open override func layoutSubviews() {
-        super.layoutSubviews()
-        collectionView?.reloadItems(at: [IndexPath(row: currentIndex, section: 0)])
-        collectionView?.scrollToItem(at: IndexPath(row: currentIndex, section: 0), at: scrollPosition, animated: true)
-        self.setUpScrollBarPosition(atIndex: currentIndex)
+    private func initData() {
+        self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: nil)
+    }
+    
+    private func setMinimumLineSpacing() {
+        if self.tabBarOptions.isAutoSetMinimumLineSpacing {
+            var totalWidth: CGFloat = 0.0
+            var autoSetMinimumLineSpacingMaxCount = self.tabBarOptions.autoSetMinimumLineSpacingMaxCount
+            if autoSetMinimumLineSpacingMaxCount <= 0 {
+                self.tabBarOptions.autoSetMinimumLineSpacingMaxCount = 0
+                flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+            } else if let count = delegate?.pjTabBarNumberOfItems() {
+                if autoSetMinimumLineSpacingMaxCount > count {
+                    autoSetMinimumLineSpacingMaxCount = count
+                }
+                for i in 0..<autoSetMinimumLineSpacingMaxCount {
+                    if let title = delegate?.pjTabBar(self, pjTabBarItemAt: i) {
+                        var titleWidth = self.sizeForItem(title: title).width
+                        if self.tabBarOptions.maxItemWidth > 0.0 {
+                            if titleWidth > self.tabBarOptions.maxItemWidth {
+                                titleWidth = self.tabBarOptions.maxItemWidth
+                            }
+                        }
+                        totalWidth += titleWidth
+                    }
+                }
+                
+                var minimumLineSpacing = (self.frame.size.width - totalWidth - self.tabBarOptions.sectionInset.left - self.tabBarOptions.sectionInset.right) / CGFloat(autoSetMinimumLineSpacingMaxCount)
+                if minimumLineSpacing < 0 {
+                    print("⚠️: minimumLineSpacing is less than 0")
+                    minimumLineSpacing = 0
+                }
+                self.tabBarOptions.minimumLineSpacing = minimumLineSpacing
+                flowLayout.minimumLineSpacing = minimumLineSpacing
+            } else {
+                flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+            }
+        } else {
+            flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+        }
+    }
+    
+    deinit {
+        self.removeObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath)
+    }
+    
+    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == PJTabBarView.kPJTabBarViewWidthKeyPath {
+            if self.lastWidth != self.frame.size.width {
+                self.setMinimumLineSpacing()
+                self.lastWidth = self.frame.size.width
+            }
+        }
     }
 }
 
@@ -215,21 +319,24 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PJTabBarView.kPJTabBarIdentifier, for: indexPath) as? PJTabBarViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PJTabBarView.kPJTabBarIdentifier, for: indexPath) as? PJTabBarCell
         configCell(cell: cell!, indexPath: indexPath)
+//        if indexPath.row == self.currentIndex {
+//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: {
+////                self.scrollBar.frame.origin.y = collectionView.frame.size.height - self.scrollBar.frame.size.height
+//                self.scrollToItem(at: indexPath.row)
+//            })
+//        }
         return cell!
     }
     
-    public func configCell(cell: PJTabBarViewCell, indexPath: IndexPath) {
-        cell.titleFont = titleFont
-        cell.titleSelectedColor = titleSelectedColor
-        cell.titleColor = titleColor
-        cell.titleAlpha = titleAlpha
-        cell.titleSelectedAlpha = titleSelectedAlpha
+    public func configCell(cell: PJTabBarCell, indexPath: IndexPath) {
         let pjTabBarItem = self.items[indexPath.row]
-        cell.pjTabBarItem = pjTabBarItem
-        cell.backgroundColor = .orange
-        if let textAlignment = pjTabBarItem?.titleTextAlignment {
+        pjTabBarItem?.tabBarOptions = self.tabBarOptions
+        if let tabBarItem = pjTabBarItem {
+            cell.pjTabBarItem = tabBarItem
+        }
+        if let textAlignment = pjTabBarItem?.tabBarOptions.titleTextAlignment {
             cell.setTextAlignment(textAlignment: textAlignment)
         } else {
             cell.setTextAlignment(textAlignment: .center)
@@ -241,16 +348,16 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, sizeForItemAt sizeForItemAtIndexPath: IndexPath) -> CGSize {
-        if itemSize != CGSize.zero {
-            return itemSize
+        if self.tabBarOptions.itemSize != CGSize.zero {
+            return self.tabBarOptions.itemSize
         }
         
         guard let title = delegate?.pjTabBar(self, pjTabBarItemAt: sizeForItemAtIndexPath.row) else {
-            return CGSize.zero
+            return .zero
         }
         
         if let pjTabBarItem = self.items[sizeForItemAtIndexPath.row] {
-            if pjTabBarItem.cellSize == .zero || maxItemWidth > 0 {
+            if pjTabBarItem.cellSize == .zero || self.tabBarOptions.maxItemWidth > 0 {
                 pjTabBarItem.cellSize = sizeForItem(title: title)
             }
             return pjTabBarItem.cellSize
@@ -265,12 +372,23 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
             return pjTabBarItem.cellSize
         }
     }
+    
+//    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        if indexPath.row == collectionView.indexPathsForVisibleItems.last?.row {
+//             self.finishedLayoutClosure?(self)
+//        } else {
+//            collectionView.reloadItems(at: [IndexPath(row: self.currentIndex, section: 0)])
+//            collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+//            self.setUpScrollBarPosition(atIndex: self.currentIndex)
+//        }
+//    }
 }
 
 //MARK: UICollectionView UICollectionViewDelegate
 extension PJTabBarView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.scrollToItem(at: indexPath.row, at: scrollPosition)
+        self.delegate?.pjTabBarWillChange?(self, fromIndex: currentIndex, toIndex: indexPath.row)
+        self.scrollToItem(at: indexPath.row, at: self.tabBarOptions.scrollPosition)
     }
 }
 
@@ -283,8 +401,8 @@ public extension PJTabBarView {
     ///   - indexPaths: get cells by indexPaths
     ///   - reload: if cell is not visible,set reload `true` to reload and get visible cell
     /// - Returns: cells for indexPaths
-    private func cellForItems(at indexPaths: [IndexPath], reloadIfNotVisible reload: Bool = true) -> [PJTabBarViewCell?] {
-        let cells = indexPaths.map { collectionView.cellForItem(at: $0) as? PJTabBarViewCell }
+    private func cellForItems(at indexPaths: [IndexPath], reloadIfNotVisible reload: Bool = true) -> [PJTabBarCell?] {
+        let cells = indexPaths.map { collectionView.cellForItem(at: $0) as? PJTabBarCell }
         
         if reload {
             let indexPathsToReload = cells.enumerated()
@@ -308,14 +426,14 @@ public extension PJTabBarView {
     /// - Parameters:
     ///   - index: the index which you want scroll to
     ///   - isSendChange: Whether to tell the caller, current select item has been changed
-    func scrollToItem(at index: Int, at position: UICollectionViewScrollPosition = .centeredHorizontally) {
-        assert(delegate?.pjTabBarNumberOfItems() != nil && index < (delegate?.pjTabBarNumberOfItems())!, "index out of bounds ")
+    public func scrollToItem(at index: Int, at position: UICollectionViewScrollPosition = .centeredHorizontally) {
+        assert(delegate?.pjTabBarNumberOfItems() != nil && index < (delegate?.pjTabBarNumberOfItems())!, "PJTabBar: index out of bounds ")
         
         if index == currentIndex {
             return
         }
         
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: self.tabBarOptions.animationDuration) {
             self.setUpScrollBarPosition(atIndex: index)
         }
         
@@ -345,7 +463,7 @@ public extension PJTabBarView {
             oldTabBarItem.isSelect = false
         }
         
-        if let oldSelectCell = cells.first as? PJTabBarViewCell {
+        if let oldSelectCell = cells.first as? PJTabBarCell {
             oldSelectCell.setSelected(selected: false)
         }
         
@@ -355,19 +473,24 @@ public extension PJTabBarView {
             currentPhoneTabBarItem = newTabBarItem
         }
         
-        if let newSelectCell = cells.last as? PJTabBarViewCell {
+        if let newSelectCell = cells.last as? PJTabBarCell {
             newSelectCell.setSelected(selected: true)
         }
     }
     
-    func sizeForItem(title: String) -> CGSize {
-        let width = title.boundingSizeBySize(CGSize(width: maxItemWidth == 0.0 ? CGFloat.greatestFiniteMagnitude : maxItemWidth, height: collectionView.frame.size.height), font: titleFont).width
-        return CGSize(width: width, height: collectionView.frame.size.height)
+    private func sizeForItem(title: String) -> CGSize {
+        let width = title.boundingSizeBySize(CGSize(width: self.tabBarOptions.maxItemWidth == 0.0 ? CGFloat.greatestFiniteMagnitude : self.tabBarOptions.maxItemWidth, height: collectionView.frame.size.height), font: self.tabBarOptions.titleFont).width
+        return CGSize(width: width + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding, height: collectionView.frame.size.height)
     }
 }
 
 //MARK: PhoneTabBar set
 public extension PJTabBarView {
+    
+    /// reload all Items
+    public func reloadData() {
+        collectionView.reloadData()
+    }
     
     /// reload Items at index
     public func reloadItems(at indexPaths: [IndexPath]) {
@@ -379,8 +502,8 @@ public extension PJTabBarView {
     /// - Parameters:
     ///   - title: new title for item at index
     ///   - atIndex: at index
-    func setTitle(title: String, atIndex: Int) {
-        assert(delegate?.pjTabBarNumberOfItems() != nil && atIndex < (delegate?.pjTabBarNumberOfItems())!, "index out of bounds")
+    public func setTitle(title: String, atIndex: Int) {
+        assert(delegate?.pjTabBarNumberOfItems() != nil && atIndex < (delegate?.pjTabBarNumberOfItems())!, "PJTabBar: atIndex out of bounds")
         let pjTabBarItem = self.items[atIndex]
         pjTabBarItem?.title = title
         pjTabBarItem?.cellSize = self.sizeForItem(title: title)
@@ -390,10 +513,10 @@ public extension PJTabBarView {
         }
     }
     
-    func setTextAlignment(textAlignment: NSTextAlignment, atIndex: Int) {
-        assert(delegate?.pjTabBarNumberOfItems() != nil && atIndex < (delegate?.pjTabBarNumberOfItems())!, "index out of bounds")
+    public func setTextAlignment(textAlignment: NSTextAlignment, atIndex: Int) {
+        assert(delegate?.pjTabBarNumberOfItems() != nil && atIndex < (delegate?.pjTabBarNumberOfItems())!, "PJTabBar: atIndex out of bounds")
         if let pjtarBarItem = self.items[atIndex] {
-            pjtarBarItem.titleTextAlignment = textAlignment
+            pjtarBarItem.tabBarOptions.titleTextAlignment = textAlignment
             collectionView.reloadItems(at: [IndexPath(row: atIndex, section: 0)])
             if currentIndex == atIndex {
                 setUpScrollBarPosition(atIndex: atIndex)
@@ -402,6 +525,9 @@ public extension PJTabBarView {
     }
     
     private func setUpScrollBarPosition(atIndex: Int) {
+        if !self.tabBarOptions.isNeedScrollBar {
+            return
+        }
         if let attr = collectionView?.layoutAttributesForItem(at: IndexPath(row: atIndex, section: 0)), let title = delegate?.pjTabBar(self, pjTabBarItemAt: atIndex), let pjTabBarItem = self.items[atIndex] {
             
             var scrollBarWidth: CGFloat = pjTabBarItem.cellSize.width
@@ -409,26 +535,149 @@ public extension PJTabBarView {
                 pjTabBarItem.cellSize = sizeForItem(title: title)
                 scrollBarWidth = pjTabBarItem.cellSize.width
             }
-            if maxItemWidth > 0, scrollBarWidth > maxItemWidth { scrollBarWidth = maxItemWidth }
-            scrollBar.frame.size = CGSize(width: scrollBarWidth, height: scrollBarHeigth)
-            let scrollBarY = collectionView.frame.maxY - scrollBarHeigth
-            if let pjtarBarItem = self.items[atIndex] {
-                switch pjtarBarItem.titleTextAlignment {
-                case .left :
-                    scrollBar.frame.origin = CGPoint(x: attr.frame.origin.x, y: scrollBarY)
-                    break
-                case .right :
-                    scrollBar.frame.origin = CGPoint(x: attr.frame.maxX - scrollBar.frame.size.width, y: scrollBarY)
-                    break
-                default :
-                    scrollBar.center = CGPoint(x: attr.center.x, y: scrollBarY)
-                    scrollBar.frame.origin = CGPoint(x: scrollBar.frame.origin.x, y: scrollBarY)
-                    break
-                }
-            } else {
-                scrollBar.center = CGPoint(x: attr.center.x, y: scrollBarY)
-                scrollBar.frame.origin = CGPoint(x: scrollBar.frame.origin.x, y: scrollBarY)
+            if self.tabBarOptions.scrollBarConstWidth != 0.0 {
+                scrollBarWidth = self.tabBarOptions.scrollBarConstWidth
+            }
+            self.scrollBar.frame.size = CGSize(width: scrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding, height: self.tabBarOptions.scrollBarHeigth)
+            let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height
+            switch pjTabBarItem.tabBarOptions.titleTextAlignment {
+            case .left :
+                self.scrollBar.frame.origin = CGPoint(x: attr.frame.origin.x + self.tabBarOptions.leftPadding, y: scrollBarY)
+                break
+            case .right :
+                self.scrollBar.frame.origin = CGPoint(x: attr.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding, y: scrollBarY)
+                break
+            default :
+                let scrollBarCenterX = self.tabBarOptions.leftPadding + (attr.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+                self.scrollBar.center = CGPoint(x: attr.frame.origin.x + scrollBarCenterX, y: scrollBarY)
+                break
             }
         }
+    }
+    
+    /// rolling scrollBar when switching
+    public func moveScrollBar(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat) {
+        if !self.tabBarOptions.isNeedScrollBar {
+            return
+        }
+//        self.currentIndex = progressPercentage > 0.5 ? toIndex : fromIndex
+
+        let cells = cellForItems(at: [IndexPath(row: fromIndex, section: 0), IndexPath(row: toIndex, section: 0)], reloadIfNotVisible: true)
+        
+        guard let numberOfItems = self.collectionView.dataSource?.collectionView(self.collectionView, numberOfItemsInSection: 0), let fromFrame = self.collectionView.layoutAttributesForItem(at: IndexPath(item: fromIndex, section: 0))?.frame, cells.count == 2, let fromCell = cells.first as? PJTabBarCell, let toCell = cells.last as? PJTabBarCell else {
+            return
+        }
+
+        ///change title color by progressPercentage
+        var narR: CGFloat = 0, narG: CGFloat = 0, narB: CGFloat = 0, narA: CGFloat = 1
+        self.tabBarOptions.titleColor.getRed(&narR, green: &narG, blue: &narB, alpha: &narA)
+        var selR: CGFloat = 0, selG: CGFloat = 0, selB: CGFloat = 0, selA: CGFloat = 1
+        self.tabBarOptions.titleSelectedColor.getRed(&selR, green: &selG, blue: &selB, alpha: &selA)
+        let detalR = narR - selR , detalG = narG - selG, detalB = narB - selB, detalA = narA - selA
+        fromCell.titleLabel.textColor = UIColor(red: selR + detalR * progressPercentage, green: selG + detalG * progressPercentage, blue: selB + detalB * progressPercentage, alpha: selA + detalA * progressPercentage)
+        toCell.titleLabel.textColor = UIColor(red: narR - detalR * progressPercentage, green: narG - detalG * progressPercentage, blue: narB - detalB * progressPercentage, alpha: narA - detalA * progressPercentage)
+        
+        var toFrame: CGRect
+
+        if toIndex < 0 || toIndex > numberOfItems - 1 {
+            if toIndex < 0 {
+                if let tempcellAtts = self.collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: 0)) {
+                    toFrame = tempcellAtts.frame.offsetBy(dx: -tempcellAtts.frame.size.width, dy: 0)
+                } else {
+                    return
+                }
+            } else {
+                if let tempcellAtts = self.collectionView.layoutAttributesForItem(at: IndexPath(item: (numberOfItems - 1), section: 0)) {
+                    toFrame = tempcellAtts.frame.offsetBy(dx: tempcellAtts.frame.size.width, dy: 0)
+                } else {
+                    return
+                }
+            }
+        } else {
+            if let tempFrame = self.collectionView.layoutAttributesForItem(at: IndexPath(item: toIndex, section: 0))?.frame {
+                toFrame = tempFrame
+            } else {
+                return
+            }
+        }
+
+        var targetFrame = fromFrame
+        targetFrame.size.height = self.scrollBar.frame.size.height
+        targetFrame.size.width += (toFrame.size.width - fromFrame.size.width) * progressPercentage
+        
+        if self.tabBarOptions.scrollBarConstWidth != 0.0 {
+            targetFrame.size.width = self.tabBarOptions.scrollBarConstWidth
+        } else if self.tabBarOptions.maxItemWidth > 0, targetFrame.size.width > self.tabBarOptions.maxItemWidth {
+            targetFrame.size.width = self.tabBarOptions.maxItemWidth
+        }
+        
+//        let toTabBarItem = toCell.pjTabBarItem
+        
+//        switch toTabBarItem.tabBarOptions.titleTextAlignment {
+//        case .left :
+////            self.scrollBar.frame.origin = CGPoint(x: toCell.frame.origin.x + self.tabBarOptions.leftPadding, y: self.scrollBar.frame.origin.y)
+//            targetFrame.origin.x += (toFrame.origin.x + self.tabBarOptions.leftPadding - fromFrame.origin.x) * progressPercentage
+//            break
+//        case .right :
+////            self.scrollBar.frame.origin = CGPoint(x: toCell.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding, y: self.scrollBar.frame.origin.y)
+//            targetFrame.origin.x += (toCell.frame.maxX - scrollBar.frame.size.width - self.tabBarOptions.rightPadding - fromFrame.origin.x) * progressPercentage
+//            break
+//        default :
+////            let scrollBarCenterX = self.tabBarOptions.leftPadding + (toCell.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+////            self.scrollBar.center = CGPoint(x: toCell.frame.origin.x + scrollBarCenterX, y: self.scrollBar.frame.origin.y)
+//            targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
+//            break
+//        }
+        
+        targetFrame.origin.x += (toFrame.origin.x - fromFrame.origin.x) * progressPercentage
+
+        self.scrollBar.frame = CGRect(x: targetFrame.origin.x, y: self.scrollBar.frame.origin.y, width: targetFrame.size.width, height: self.scrollBar.frame.size.height)
+
+        var targetContentOffset: CGFloat = 0.0
+        if self.collectionView.contentSize.width > self.frame.size.width {
+            let toContentOffset = contentOffsetForCell(withFrame: toFrame, andIndex: toIndex)
+            let fromContentOffset = contentOffsetForCell(withFrame: fromFrame, andIndex: fromIndex)
+
+            targetContentOffset = fromContentOffset + ((toContentOffset - fromContentOffset) * progressPercentage)
+        }
+
+        self.collectionView.setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
+    }
+    
+    private func contentOffsetForCell(withFrame cellFrame: CGRect, andIndex index: Int) -> CGFloat {
+        let sectionInset = self.flowLayout.sectionInset // swiftlint:disable:this force_cast
+
+        var alignmentOffset: CGFloat = 0.0
+
+        if let tabBarItem = self.items[index] {
+            switch tabBarItem.tabBarOptions.titleTextAlignment {
+            case .left:
+                alignmentOffset = sectionInset.left
+                break
+            case .right:
+                alignmentOffset = frame.size.width - sectionInset.right - cellFrame.size.width
+                break
+            case .center:
+                alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
+                break
+            default :
+                if let numberOfItems = self.collectionView.dataSource?.collectionView(self.collectionView, numberOfItemsInSection: 0) {
+                    let cellHalfWidth = cellFrame.size.width * 0.5
+                    let leftAlignmentOffset = sectionInset.left + cellHalfWidth
+                    let rightAlignmentOffset = frame.size.width - sectionInset.right - cellHalfWidth
+                    let progress = index / (numberOfItems - 1)
+                    alignmentOffset = leftAlignmentOffset + (rightAlignmentOffset - leftAlignmentOffset) * CGFloat(progress) - cellHalfWidth
+                } else {
+                    alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
+                }
+                break
+            }
+        } else {
+            alignmentOffset = (frame.size.width - cellFrame.size.width) * 0.5
+        }
+        var contentOffset = cellFrame.origin.x - alignmentOffset
+        contentOffset = max(0, contentOffset)
+        contentOffset = min(self.collectionView.contentSize.width - frame.size.width, contentOffset)
+        return contentOffset
     }
 }

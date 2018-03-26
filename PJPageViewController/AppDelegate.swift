@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         self.window = UIWindow(frame: UIScreen.main.bounds)
         let pjTabBarDemoViewController = PJTabBarDemoViewController()
+//        let pjTabBarDemoViewController = DemoTableViewController()
         self.window?.rootViewController = pjTabBarDemoViewController
         self.window?.makeKeyAndVisible()
         return true
