@@ -10,75 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PJPageViewController/PJTabBar/PJPageViewController.swift"
-            timestampString = "543765514.643232"
+            timestampString = "543813208.248438"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
-            landmarkName = "initData()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "PJPageViewController.PJPageViewController.(initData in _AC986A763D61493B13E417F5D358DD8B)() -&gt; ()"
-                  moduleName = "PJPageViewController"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zoey.weng/Desktop/Piaojin%20Open%20Source/%E6%94%AF%E6%8C%81%E5%88%86%E7%BB%84%E7%89%88/PJPageViewController/PJPageViewController/PJTabBar/PJPageViewController.swift"
-                  timestampString = "543764771.036256"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "205"
-                  endingLineNumber = "205"
-                  offsetFromSymbolStart = "138">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Bool) -&gt; () in PJPageViewController.PJPageViewController.(initData in _AC986A763D61493B13E417F5D358DD8B)() -&gt; ()"
-                  moduleName = "PJPageViewController"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zoey.weng/Desktop/Piaojin%20Open%20Source/%E6%94%AF%E6%8C%81%E5%88%86%E7%BB%84%E7%89%88/PJPageViewController/PJPageViewController/PJTabBar/PJPageViewController.swift"
-                  timestampString = "543764771.040652"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "206"
-                  endingLineNumber = "206"
-                  offsetFromSymbolStart = "35">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "PJPageViewController/PJTabBar/PJPageViewController.swift"
-            timestampString = "543765514.643679"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
-            landmarkName = "initData()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "PJPageViewController/PJTabBar/PJPageViewController.swift"
-            timestampString = "543765514.644031"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "371"
-            endingLineNumber = "371"
+            startingLineNumber = "379"
+            endingLineNumber = "379"
             landmarkName = "pjTabBarDidChange(_:fromIndex:toIndex:)"
             landmarkType = "7">
          </BreakpointContent>

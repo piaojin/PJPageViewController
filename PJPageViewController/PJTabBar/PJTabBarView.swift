@@ -316,6 +316,8 @@ open class PJTabBarView: UIView {
                     }
                 }
             }
+        } else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
 }
