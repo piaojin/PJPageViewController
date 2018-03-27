@@ -8,6 +8,12 @@
 
 import UIKit
 
+//custom cell protocol
+public protocol PJTabBarViewCellProtocol: NSObjectProtocol {
+    ///this is important for PJTabBarView to set data to each cell
+    var pjTabBarItem: PJTabBarItem {set get}
+}
+
 @objc public protocol PJTabBarViewDelegate: NSObjectProtocol {
     @objc optional func pjTabBarDidChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int)
     
@@ -16,11 +22,17 @@ import UIKit
     func pjTabBarNumberOfItems() -> Int
     
     func pjTabBar(_ pjTabBarView: PJTabBarView, pjTabBarItemAt index: Int) -> String
+    
+    ///this is important for PJTabBarView to create a new cell, if you want set custom cell.
+    @objc optional func tabBarCellIdentifier() -> String
+    ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell.
+    @objc optional func customCellClass() -> UICollectionViewCell.Type
 }
 
 @IBDesignable
 open class PJTabBarView: UIView {
     
+    private static let kPJTabBarIdentifier = "PJTabBarViewCell"
     private static let kPJTabBarViewWidthKeyPath = "frame"
     private static let kCollectionViewWidthKeyPath = "contentSize"
     private var kPJTabBarViewContext = 0
@@ -169,7 +181,6 @@ open class PJTabBarView: UIView {
         }
     }
     
-    private static let kPJTabBarIdentifier = "PJTabBarViewCell"
     open var flowLayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout() {
         didSet {
             self.collectionView.collectionViewLayout = flowLayout
@@ -228,7 +239,7 @@ open class PJTabBarView: UIView {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        collectionView.register(PJTabBarCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
+//        collectionView.register(PJTabBarCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = self.backgroundColor
         self.addSubview(collectionView)
@@ -246,13 +257,18 @@ open class PJTabBarView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
-        collectionView.delegate = self
-        collectionView.dataSource = self
     }
     
     private func initData() {
         self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: &self.kPJTabBarViewContext)
         self.collectionView.addObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath, options: [.new, .old], context: &self.kCollectionViewContext)
+        if let cellClass = self.delegate?.customCellClass?(), let tabBarCellIdentifier = self.delegate?.tabBarCellIdentifier?() {
+            self.collectionView.register(cellClass, forCellWithReuseIdentifier: tabBarCellIdentifier)
+        } else {
+            self.collectionView.register(PJTabBarCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
+        }
+        self.collectionView.delegate = self
+        self.collectionView.dataSource = self
     }
     
     private func setMinimumLineSpacing() {
@@ -332,15 +348,25 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PJTabBarView.kPJTabBarIdentifier, for: indexPath) as? PJTabBarCell
-        configCell(cell: cell!, indexPath: indexPath)
-        return cell!
+        if let delegate = self.delegate {
+            var identifier = PJTabBarView.kPJTabBarIdentifier
+            if let tabBarCellIdentifier = delegate.tabBarCellIdentifier?() {
+                identifier = tabBarCellIdentifier
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
+            configCell(cell: cell, indexPath: indexPath)
+            return cell
+        } else {
+            return UICollectionViewCell()
+        }
     }
     
-    public func configCell(cell: PJTabBarCell, indexPath: IndexPath) {
+    public func configCell(cell: UICollectionViewCell, indexPath: IndexPath) {
         let pjTabBarItem = self.itemAt(index: indexPath.row)
         pjTabBarItem.tabBarOptions = self.tabBarOptions
-        cell.pjTabBarItem = pjTabBarItem
+        if let tempCell = cell as? PJTabBarViewCellProtocol {
+             tempCell.pjTabBarItem = pjTabBarItem
+        }
         self.items[indexPath.row] = pjTabBarItem
         
         if indexPath.row == currentIndex {

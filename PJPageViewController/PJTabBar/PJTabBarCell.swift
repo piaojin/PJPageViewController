@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class PJTabBarCell: UICollectionViewCell {
+open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
     
     private var titleLeadingAnchor: NSLayoutConstraint?
     
@@ -21,7 +21,7 @@ open class PJTabBarCell: UICollectionViewCell {
         return label
     }()
     
-    var pjTabBarItem: PJTabBarItem = PJTabBarItem(title: "") {
+    public var pjTabBarItem: PJTabBarItem = PJTabBarItem(title: "") {
         didSet {
             self.updateTitle()
             self.setSelected(selected: pjTabBarItem.isSelect)
