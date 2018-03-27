@@ -29,15 +29,15 @@ public struct PJPageOptions {
     
     public var rightPadding: CGFloat = 0.0
     
-    public var titleSelectedColor: UIColor = .black
+    public var titleSelectedColor: UIColor = .orange
     
-    public var titleColor: UIColor = .white
+    public var titleColor: UIColor = .black
     
     public var cellSelectedColor: UIColor = .clear
     
     public var cellColor: UIColor = .clear
     
-    public var titleAlpha: CGFloat = 0.4
+    public var titleAlpha: CGFloat = 1.0
     
     public var titleSelectedAlpha: CGFloat = 1.0
     

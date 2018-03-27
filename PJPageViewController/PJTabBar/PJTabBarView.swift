@@ -155,7 +155,7 @@ open class PJTabBarView: UIView {
     open weak var delegate: PJTabBarViewDelegate? {
         didSet {
             if delegate != nil {
-                assert(delegate?.pjTabBarNumberOfItems() != nil && currentIndex <= (delegate?.pjTabBarNumberOfItems())! && currentIndex >= 0, "PJTabBar: currentIndex out of bounds")
+                assert(delegate?.pjTabBarNumberOfItems() != nil && (delegate?.pjTabBarNumberOfItems())! > 0 && currentIndex <= (delegate?.pjTabBarNumberOfItems())! && currentIndex >= 0, "PJTabBar: currentIndex out of bounds")
                 if let tabBarItem = self.items[currentIndex] {
                     tabBarItem.isSelect = true
                 } else {
@@ -551,7 +551,7 @@ public extension PJTabBarView {
                 scrollBarWidth = attr.frame.size.width
             }
             self.scrollBar.frame.size = CGSize(width: scrollBarWidth, height: self.tabBarOptions.scrollBarHeigth)
-            let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height
+            let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height / 2.0
             let scrollBarCenterX = self.tabBarOptions.leftPadding + (attr.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
             self.scrollBar.center = CGPoint(x: attr.frame.origin.x + scrollBarCenterX, y: scrollBarY)
         }
