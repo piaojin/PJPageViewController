@@ -25,7 +25,7 @@ public protocol PJTabBarViewCellProtocol: NSObjectProtocol {
     
     ///this is important for PJTabBarView to create a new cell, if you want set custom cell.
     @objc optional func tabBarCellIdentifier() -> String
-    ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell.
+    ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell. Remember to implement PJTabBarViewCellProtocol for yoor custom cell.
     @objc optional func customCellClass() -> UICollectionViewCell.Type
 }
 
