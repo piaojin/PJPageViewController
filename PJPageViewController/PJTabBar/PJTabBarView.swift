@@ -33,14 +33,8 @@ public protocol PJTabBarViewCellProtocol: NSObjectProtocol {
 open class PJTabBarView: UIView {
     
     private static let kPJTabBarIdentifier = "PJTabBarViewCell"
-    private static let kPJTabBarViewWidthKeyPath = "frame"
-    private static let kCollectionViewWidthKeyPath = "contentSize"
-    private var kPJTabBarViewContext = 0
-    private var kCollectionViewContext = 1
     
     open var clickCellClosure: ((PJTabBarView, Int) -> ())?
-    
-    private var lastWidth: CGFloat = 0.0
     
     open var items: [Int : PJTabBarItem] = [:]
     
@@ -257,8 +251,6 @@ open class PJTabBarView: UIView {
     }
     
     private func initData() {
-        self.addObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath, options: [.new, .old], context: &self.kPJTabBarViewContext)
-        self.collectionView.addObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath, options: [.new, .old], context: &self.kCollectionViewContext)
         if let cellClass = self.delegate?.customCellClass?(), let tabBarCellIdentifier = self.delegate?.tabBarCellIdentifier?() {
             self.collectionView.register(cellClass, forCellWithReuseIdentifier: tabBarCellIdentifier)
         } else {
@@ -304,35 +296,15 @@ open class PJTabBarView: UIView {
         } else {
             flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
         }
-        self.flowLayout.invalidateLayout()
     }
     
-    deinit {
-        self.removeObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath)
-    }
-    
-    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == PJTabBarView.kPJTabBarViewWidthKeyPath, context == &self.kPJTabBarViewContext {
-            //auto set minimumLineSpacing(Rotating screen)
-            if self.lastWidth != self.frame.size.width {
-                self.setMinimumInteritemSpacing()
-                self.lastWidth = self.frame.size.width
-                self.setUpScrollBarPosition(atIndex: self.currentIndex)
-            }
-        } else if keyPath == PJTabBarView.kCollectionViewWidthKeyPath, context == &self.kCollectionViewContext {
-            // set default current index if current index is more 0
-            if self.collectionView.contentSize != .zero {
-                self.collectionView.removeObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath)
-                if let delegate = self.delegate {
-                    if self.currentIndex > 0, self.currentIndex <= delegate.pjTabBarNumberOfItems() - 1 {
-                        self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
-                        self.setUpScrollBarPosition(atIndex: self.currentIndex)
-                    }
-                }
-            }
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
+    ///auto set minimumLineSpacing(Rotating screen). The number of calls is acceptable.
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        ///set some default value
+        self.setMinimumInteritemSpacing()
+        self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+        self.setUpScrollBarPosition(atIndex: self.currentIndex)
     }
 }
 
@@ -395,9 +367,6 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
             if pjTabBarItem.cellSize.width == 0.0 || pjTabBarItem.cellSize.height == 0.0 || self.tabBarOptions.maxItemWidth > 0 {
                 pjTabBarItem.cellSize = sizeForItem(title: title)
             }
-//            if pjTabBarItem.cellSize == .zero || self.tabBarOptions.maxItemWidth > 0 {
-//                pjTabBarItem.cellSize = sizeForItem(title: title)
-//            }
             return pjTabBarItem.cellSize
         } else {
             // first time load sizeForItem
@@ -594,14 +563,16 @@ public extension PJTabBarView {
             return
         }
 
-        ///change title color by progressPercentage
-        var narR: CGFloat = 0, narG: CGFloat = 0, narB: CGFloat = 0, narA: CGFloat = 1
-        self.tabBarOptions.titleColor.getRed(&narR, green: &narG, blue: &narB, alpha: &narA)
-        var selR: CGFloat = 0, selG: CGFloat = 0, selB: CGFloat = 0, selA: CGFloat = 1
-        self.tabBarOptions.titleSelectedColor.getRed(&selR, green: &selG, blue: &selB, alpha: &selA)
-        let detalR = narR - selR , detalG = narG - selG, detalB = narB - selB, detalA = narA - selA
-        fromCell.titleLabel.textColor = UIColor(red: selR + detalR * progressPercentage, green: selG + detalG * progressPercentage, blue: selB + detalB * progressPercentage, alpha: selA + detalA * progressPercentage)
-        toCell.titleLabel.textColor = UIColor(red: narR - detalR * progressPercentage, green: narG - detalG * progressPercentage, blue: narB - detalB * progressPercentage, alpha: narA - detalA * progressPercentage)
+        if self.tabBarOptions.isTitleGradient {
+            //change title color by progressPercentage
+            var narR: CGFloat = 0, narG: CGFloat = 0, narB: CGFloat = 0, narA: CGFloat = 1
+            self.tabBarOptions.titleColor.getRed(&narR, green: &narG, blue: &narB, alpha: &narA)
+            var selR: CGFloat = 0, selG: CGFloat = 0, selB: CGFloat = 0, selA: CGFloat = 1
+            self.tabBarOptions.titleSelectedColor.getRed(&selR, green: &selG, blue: &selB, alpha: &selA)
+            let detalR = narR - selR , detalG = narG - selG, detalB = narB - selB, detalA = narA - selA
+            fromCell.titleLabel.textColor = UIColor(red: selR + detalR * progressPercentage, green: selG + detalG * progressPercentage, blue: selB + detalB * progressPercentage, alpha: selA + detalA * progressPercentage)
+            toCell.titleLabel.textColor = UIColor(red: narR - detalR * progressPercentage, green: narG - detalG * progressPercentage, blue: narB - detalB * progressPercentage, alpha: narA - detalA * progressPercentage)
+        }
         
         var toFrame: CGRect
 

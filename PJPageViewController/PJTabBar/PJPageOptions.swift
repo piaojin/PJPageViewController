@@ -57,4 +57,6 @@ public struct PJPageOptions {
     public var isAutoSetMinimumInteritemSpacing = true
     
     public var autoSetMinimumInteritemSpacingMaxCount: Int = 3
+    
+    public var isTitleGradient = true
 }

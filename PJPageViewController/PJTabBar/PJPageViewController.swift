@@ -233,7 +233,7 @@ extension PJPageViewController: UIScrollViewDelegate {
         
         let (fromIndex, toIndex, scrollPercentage) = self.caculateIndexProgress(offsetX: scrollView.contentOffset.x, direction: direction)
         
-        print("fromIndex: \(fromIndex), toIndex: \(toIndex), progressPercentage: \(scrollPercentage), offsetX: \(scrollView.contentOffset.x), swipeDirection: \(swipeDirection), currentIndex: \(currentIndex)")
+//        print("fromIndex: \(fromIndex), toIndex: \(toIndex), progressPercentage: \(scrollPercentage), offsetX: \(scrollView.contentOffset.x), swipeDirection: \(swipeDirection), currentIndex: \(currentIndex)")
         
         if fromIndex == -1, toIndex == fromIndex {
             return
