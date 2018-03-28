@@ -81,7 +81,6 @@ class DemoSectionTableViewController: UIViewController, PJCoverPageViewProtocol 
         tabBarViewConfiguration.scrollBarHeigth = 2.0
         tabBarViewConfiguration.titleColor = .red
         tabBarViewConfiguration.titleSelectedColor = .black
-        tabBarViewConfiguration.minimumLineSpacing = 60.0
         tabBarViewConfiguration.minimumInteritemSpacing = 60.0
         
         let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)

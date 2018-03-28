@@ -10,15 +10,13 @@ import UIKit
 
 public struct PJPageOptions {
     
-    public var scrollBarColor: UIColor = .blue
+    public var scrollBarColor: UIColor = .orange
     
-    public var scrollBarHeigth: CGFloat = 2.0
+    public var scrollBarHeigth: CGFloat = 4.0
     
     public var scrollBarConstWidth: CGFloat = 0.0
     
     public var minimumInteritemSpacing: CGFloat = 60.0
-    
-    public var minimumLineSpacing: CGFloat = 60.0
     
     /// the size of cell
     public var itemSize: CGSize = .zero
@@ -56,7 +54,7 @@ public struct PJPageOptions {
     
     public var isNeedScrollBar = true
     
-    public var isAutoSetMinimumLineSpacing = true
+    public var isAutoSetMinimumInteritemSpacing = true
     
-    public var autoSetMinimumLineSpacingMaxCount: Int = 3
+    public var autoSetMinimumInteritemSpacingMaxCount: Int = 3
 }

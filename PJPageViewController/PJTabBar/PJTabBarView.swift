@@ -64,16 +64,8 @@ open class PJTabBarView: UIView {
         }
     }
     
-    @IBInspectable open var minimumLineSpacing: CGFloat = 60.0 {
-        didSet {
-            flowLayout.minimumLineSpacing = minimumLineSpacing
-            self.tabBarOptions.minimumLineSpacing = minimumLineSpacing
-            setUpScrollBarPosition(atIndex: currentIndex)
-        }
-    }
-    
     /// the size of cell
-    @IBInspectable open var itemSize: CGSize = CGSize.zero {
+    @IBInspectable open var itemSize: CGSize = .zero {
         didSet {
             flowLayout.itemSize = itemSize
             self.tabBarOptions.itemSize = itemSize
@@ -117,7 +109,7 @@ open class PJTabBarView: UIView {
         }
     }
     
-    @IBInspectable open var sectionInset: UIEdgeInsets = UIEdgeInsets.zero {
+    @IBInspectable open var sectionInset: UIEdgeInsets = .zero {
         didSet {
             flowLayout.sectionInset = sectionInset
             self.tabBarOptions.sectionInset = sectionInset
@@ -206,22 +198,22 @@ open class PJTabBarView: UIView {
         self.initData()
     }
     
-    public convenience init(frame: CGRect, tabBarOptions: PJPageOptions) {
-        self.init(frame: frame)
+    public init(tabBarOptions: PJPageOptions) {
+        super.init(frame: .zero)
         self.tabBarOptions = tabBarOptions
-        self.flowLayout.minimumLineSpacing = tabBarOptions.minimumLineSpacing
-        self.flowLayout.minimumInteritemSpacing = tabBarOptions.minimumInteritemSpacing
+        self.initSubViews()
+        self.initData()
     }
     
-    public convenience init(tabBarOptions: PJPageOptions) {
-        self.init(frame: .zero)
+    public init(frame: CGRect, tabBarOptions: PJPageOptions) {
+        super.init(frame: frame)
         self.tabBarOptions = tabBarOptions
-        self.flowLayout.minimumLineSpacing = tabBarOptions.minimumLineSpacing
-        self.flowLayout.minimumInteritemSpacing = tabBarOptions.minimumInteritemSpacing
+        self.initSubViews()
+        self.initData()
     }
     
     public convenience init() {
-        self.init(frame: .zero)
+        self.init(tabBarOptions: PJPageOptions())
     }
     
     override open func awakeFromNib() {
@@ -239,7 +231,6 @@ open class PJTabBarView: UIView {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-//        collectionView.register(PJTabBarCell.classForCoder(), forCellWithReuseIdentifier: PJTabBarView.kPJTabBarIdentifier)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = self.backgroundColor
         self.addSubview(collectionView)
@@ -257,6 +248,12 @@ open class PJTabBarView: UIView {
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
         }
+        
+        if self.tabBarOptions.isAutoSetMinimumInteritemSpacing {
+            self.setMinimumInteritemSpacing()
+        } else {
+            self.flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
+        }
     }
     
     private func initData() {
@@ -271,18 +268,18 @@ open class PJTabBarView: UIView {
         self.collectionView.dataSource = self
     }
     
-    private func setMinimumLineSpacing() {
-        if self.tabBarOptions.isAutoSetMinimumLineSpacing {
+    private func setMinimumInteritemSpacing() {
+        if self.tabBarOptions.isAutoSetMinimumInteritemSpacing {
             var totalWidth: CGFloat = 0.0
-            var autoSetMinimumLineSpacingMaxCount = self.tabBarOptions.autoSetMinimumLineSpacingMaxCount
-            if autoSetMinimumLineSpacingMaxCount <= 0 {
-                self.tabBarOptions.autoSetMinimumLineSpacingMaxCount = 0
-                flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+            var autoSetMinimumInteritemSpacingMaxCount = self.tabBarOptions.autoSetMinimumInteritemSpacingMaxCount
+            if autoSetMinimumInteritemSpacingMaxCount <= 0 {
+                self.tabBarOptions.autoSetMinimumInteritemSpacingMaxCount = 0
+                flowLayout.minimumInteritemSpacing = self.minimumInteritemSpacing
             } else if let count = delegate?.pjTabBarNumberOfItems() {
-                if autoSetMinimumLineSpacingMaxCount > count {
-                    autoSetMinimumLineSpacingMaxCount = count
+                if autoSetMinimumInteritemSpacingMaxCount > count {
+                    autoSetMinimumInteritemSpacingMaxCount = count
                 }
-                for i in 0..<autoSetMinimumLineSpacingMaxCount {
+                for i in 0..<autoSetMinimumInteritemSpacingMaxCount {
                     if let title = delegate?.pjTabBar(self, pjTabBarItemAt: i) {
                         var titleWidth = self.sizeForItem(title: title).width
                         if self.tabBarOptions.maxItemWidth > 0.0 {
@@ -294,32 +291,33 @@ open class PJTabBarView: UIView {
                     }
                 }
                 
-                var minimumLineSpacing = (self.frame.size.width - totalWidth - self.tabBarOptions.sectionInset.left - self.tabBarOptions.sectionInset.right) / CGFloat(autoSetMinimumLineSpacingMaxCount)
-                if minimumLineSpacing < 0 {
-                    print("⚠️: minimumLineSpacing is less than 0")
-                    minimumLineSpacing = 0
+                var minimumInteritemSpacing = (self.frame.size.width - totalWidth - self.tabBarOptions.sectionInset.left - self.tabBarOptions.sectionInset.right) / CGFloat(autoSetMinimumInteritemSpacingMaxCount)
+                if minimumInteritemSpacing < 0 {
+                    print("⚠️: minimumInteritemSpacing is less than 0")
+                    minimumInteritemSpacing = 0
                 }
-                self.tabBarOptions.minimumLineSpacing = minimumLineSpacing
-                flowLayout.minimumLineSpacing = minimumLineSpacing
+                self.tabBarOptions.minimumInteritemSpacing = minimumInteritemSpacing
+                flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
             } else {
-                flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+                flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
             }
         } else {
-            flowLayout.minimumLineSpacing = self.tabBarOptions.minimumLineSpacing
+            flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
         }
+        self.flowLayout.invalidateLayout()
     }
     
     deinit {
         self.removeObserver(self, forKeyPath: PJTabBarView.kPJTabBarViewWidthKeyPath)
-        self.collectionView.removeObserver(self, forKeyPath: PJTabBarView.kCollectionViewWidthKeyPath)
     }
     
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == PJTabBarView.kPJTabBarViewWidthKeyPath, context == &self.kPJTabBarViewContext {
             //auto set minimumLineSpacing(Rotating screen)
             if self.lastWidth != self.frame.size.width {
-                self.setMinimumLineSpacing()
+                self.setMinimumInteritemSpacing()
                 self.lastWidth = self.frame.size.width
+                self.setUpScrollBarPosition(atIndex: self.currentIndex)
             }
         } else if keyPath == PJTabBarView.kCollectionViewWidthKeyPath, context == &self.kCollectionViewContext {
             // set default current index if current index is more 0

@@ -42,10 +42,10 @@ class PJTabBarDemoViewController: UIViewController {
         tabBarViewConfiguration.scrollBarHeigth = 6.0
         tabBarViewConfiguration.titleColor = .red
         tabBarViewConfiguration.titleSelectedColor = .blue
-        tabBarViewConfiguration.autoSetMinimumLineSpacingMaxCount = 3
-//        tabBarViewConfiguration.minimumLineSpacing = 100.0
-        tabBarViewConfiguration.isAutoSetMinimumLineSpacing = false
-//        tabBarViewConfiguration.minimumInteritemSpacing = 100.0
+        tabBarViewConfiguration.autoSetMinimumInteritemSpacingMaxCount = 3
+        tabBarViewConfiguration.isAutoSetMinimumInteritemSpacing = true
+//        tabBarViewConfiguration.sectionInset = UIEdgeInsets(top: 0.0, left: 100.0, bottom: 0.0, right: 100.0)
+//        tabBarViewConfiguration.minimumInteritemSpacing = 200.0
 //        tabBarViewConfiguration.leftPadding = 20.0
 //        tabBarViewConfiguration.rightPadding = 10.0
 //        tabBarViewConfiguration.itemSize = CGSize(width: 60.0, height: 30.0)
