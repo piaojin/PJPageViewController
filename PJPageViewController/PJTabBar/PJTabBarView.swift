@@ -283,13 +283,19 @@ open class PJTabBarView: UIView {
                     }
                 }
                 
-                var minimumInteritemSpacing = (self.frame.size.width - totalWidth - self.tabBarOptions.sectionInset.left - self.tabBarOptions.sectionInset.right) / CGFloat(autoSetMinimumInteritemSpacingMaxCount)
-                if minimumInteritemSpacing < 0 {
-                    print("⚠️: minimumInteritemSpacing is less than 0")
-                    minimumInteritemSpacing = 0
+                assert(autoSetMinimumInteritemSpacingMaxCount - 1 >= 0, "autoSetMinimumInteritemSpacingMaxCount must > 0")
+                
+                if autoSetMinimumInteritemSpacingMaxCount > 1 {
+                    var minimumInteritemSpacing = (self.frame.size.width - totalWidth - self.tabBarOptions.sectionInset.left - self.tabBarOptions.sectionInset.right) / CGFloat(autoSetMinimumInteritemSpacingMaxCount - 1)
+                    if minimumInteritemSpacing < 0 {
+                        print("⚠️: minimumInteritemSpacing is less than 0")
+                        minimumInteritemSpacing = 0
+                    }
+                    self.tabBarOptions.minimumInteritemSpacing = minimumInteritemSpacing
+                    flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
+                } else {
+                    print("⚠️: autoSetMinimumInteritemSpacingMaxCount is less than 2")
                 }
-                self.tabBarOptions.minimumInteritemSpacing = minimumInteritemSpacing
-                flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
             } else {
                 flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
             }
