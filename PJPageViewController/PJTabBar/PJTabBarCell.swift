@@ -68,12 +68,16 @@ public extension PJTabBarCell {
         if selected {
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleSelectedColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleSelectedAlpha
-            self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellSelectedColor
+            if self.pjTabBarItem.tabBarOptions.cellSelectedColor != .clear {
+                self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellSelectedColor
+            }
         }
         else {
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleAlpha
-            self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellColor
+            if self.pjTabBarItem.tabBarOptions.cellColor != .clear {
+                self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellColor
+            }
         }
     }
     
