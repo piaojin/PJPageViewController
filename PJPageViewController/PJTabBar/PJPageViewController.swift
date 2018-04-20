@@ -215,7 +215,6 @@ public extension PJPageViewController {
 
 extension PJPageViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print("isClickTabBarView: \(isClickTabBarView)")
         
         if self.scrollBarScrollType != .linkage {
             return

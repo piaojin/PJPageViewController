@@ -14,14 +14,15 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
     
     private var titleTrailingAnchor: NSLayoutConstraint?
     
-    lazy var titleLabel: UILabel = {
+    open lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
+        label.backgroundColor = .black
         return label
     }()
     
-    public var pjTabBarItem: PJTabBarItem = PJTabBarItem(title: "") {
+    open var pjTabBarItem: PJTabBarItem = PJTabBarItem(title: "") {
         didSet {
             self.updateTitle()
             self.setSelected(selected: pjTabBarItem.isSelect)
@@ -46,7 +47,7 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
 
 public extension PJTabBarCell {
     
-    func initView() {
+    private func initView() {
         self.contentView.addSubview(self.titleLabel)
         self.titleLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
         self.titleLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
@@ -56,7 +57,7 @@ public extension PJTabBarCell {
         self.titleTrailingAnchor?.isActive = true
     }
     
-    func updateTitle() {
+    public func updateTitle() {
         titleLabel.font = self.pjTabBarItem.tabBarOptions.titleFont
         titleLabel.text = pjTabBarItem.title
         self.titleLeadingAnchor?.constant = self.pjTabBarItem.tabBarOptions.leftPadding
@@ -64,7 +65,7 @@ public extension PJTabBarCell {
         self.layoutIfNeeded()
     }
     
-    func setSelected(selected: Bool) {
+    public func setSelected(selected: Bool) {
         if selected {
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleSelectedColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleSelectedAlpha
@@ -75,14 +76,6 @@ public extension PJTabBarCell {
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleAlpha
             self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellColor
         }
-    }
-    
-    func setCount(count: Int) {
-        updateTitle()
-    }
-    
-    func setTitle(title: String) {
-        updateTitle()
     }
 }
 

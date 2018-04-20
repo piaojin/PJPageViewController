@@ -251,6 +251,7 @@ open class PJTabBarView: UIView {
     }
     
     private func initData() {
+        //register custom cell if has
         if let cellClass = self.delegate?.customCellClass?(), let tabBarCellIdentifier = self.delegate?.tabBarCellIdentifier?() {
             self.collectionView.register(cellClass, forCellWithReuseIdentifier: tabBarCellIdentifier)
         } else {
@@ -279,7 +280,7 @@ open class PJTabBarView: UIView {
                                 titleWidth = self.tabBarOptions.maxItemWidth
                             }
                         }
-                        totalWidth += titleWidth
+                        totalWidth += titleWidth + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding
                     }
                 }
                 
@@ -292,12 +293,12 @@ open class PJTabBarView: UIView {
                         minimumInteritemSpacing = 0
                     }
                     self.tabBarOptions.minimumInteritemSpacing = minimumInteritemSpacing
-                    flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
+                    flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
                 } else {
                     print("⚠️: autoSetMinimumInteritemSpacingMaxCount is less than 2")
                 }
             } else {
-                flowLayout.minimumInteritemSpacing = self.self.tabBarOptions.minimumInteritemSpacing
+                flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
             }
         } else {
             flowLayout.minimumInteritemSpacing = self.tabBarOptions.minimumInteritemSpacing
@@ -370,7 +371,7 @@ extension PJTabBarView: UICollectionViewDataSource, UICollectionViewDelegateFlow
         }
         
         if let pjTabBarItem = self.items[sizeForItemAtIndexPath.row] {
-            if pjTabBarItem.cellSize.width == 0.0 || pjTabBarItem.cellSize.height == 0.0 || self.tabBarOptions.maxItemWidth > 0 {
+            if pjTabBarItem.cellSize.width == 0.0 || pjTabBarItem.cellSize.height == 0.0 || self.tabBarOptions.maxItemWidth > 0.0 {
                 pjTabBarItem.cellSize = sizeForItem(title: title)
             }
             return pjTabBarItem.cellSize
@@ -424,11 +425,11 @@ public extension PJTabBarView {
         
         if reload {
             let indexPathsToReload = cells.enumerated()
-                .flatMap { (arg) -> IndexPath? in
+                .compactMap { (arg) -> IndexPath? in
                     let (index, cell) = arg
                     return cell == nil ? indexPaths[index] : nil
                 }
-                .flatMap { (indexPath: IndexPath) -> IndexPath? in
+                .compactMap { (indexPath: IndexPath) -> IndexPath? in
                     return (indexPath.item >= 0 && indexPath.item < collectionView.numberOfItems(inSection: indexPath.section)) ? indexPath : nil
             }
             
@@ -562,7 +563,16 @@ public extension PJTabBarView {
         if !self.tabBarOptions.isNeedScrollBar {
             return
         }
-
+        
+        if !self.tabBarOptions.isScrollBarLinkScrollWhenMovePage {
+            if progressPercentage >= 1.0 {
+                UIView.animate(withDuration: self.tabBarOptions.animationDuration) {
+                    self.setUpScrollBarPosition(atIndex: toIndex)
+                }
+            }
+            return
+        }
+        
         let cells = cellForItems(at: [IndexPath(row: fromIndex, section: 0), IndexPath(row: toIndex, section: 0)], reloadIfNotVisible: true)
         
         guard let numberOfItems = self.collectionView.dataSource?.collectionView(self.collectionView, numberOfItemsInSection: 0), let fromFrame = self.collectionView.layoutAttributesForItem(at: IndexPath(item: fromIndex, section: 0))?.frame, cells.count == 2, let fromCell = cells.first as? PJTabBarCell, let toCell = cells.last as? PJTabBarCell else {
@@ -607,33 +617,70 @@ public extension PJTabBarView {
         var targetFrame = fromFrame
         targetFrame.size.height = self.scrollBar.frame.size.height
         
-        if self.tabBarOptions.scrollBarConstWidth != 0.0 {
-            targetFrame.size.width = self.tabBarOptions.scrollBarConstWidth
-        } else if self.tabBarOptions.maxItemWidth > 0, targetFrame.size.width > self.tabBarOptions.maxItemWidth {
-            targetFrame.size.width = self.tabBarOptions.maxItemWidth
-        } else if targetFrame.size.width > toFrame.size.width {
-            targetFrame.size.width = toFrame.size.width
+        if self.tabBarOptions.isScrollBarConstWidth {
+            let toFrameCenterX = toFrame.origin.x + self.tabBarOptions.leftPadding + (toFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+            
+            let fromFrameCenterX = fromFrame.origin.x + self.tabBarOptions.leftPadding + (fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+            
+            self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
+        } else {
+            let maxScrollBarWidth = fromFrame.size.width + self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width
+            switch self.tabBarOptions.moveScrollBarStyle {
+            case .bounce:
+                var progressX: CGFloat = 0.0
+                var scrollBarWidth: CGFloat = self.scrollBar.frame.size.width
+                if fromFrame.origin.x < toFrame.origin.x {
+                    if progressPercentage <= 0.5 {
+                        progressX = fromFrame.origin.x + self.tabBarOptions.leftPadding
+                        scrollBarWidth = fromFrame.size.width + (self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width) * 2 * progressPercentage
+                    } else {
+                        let maxSubScrollBarWidth = maxScrollBarWidth - toFrame.size.width
+                        let subScrollBarWidth = maxScrollBarWidth - maxSubScrollBarWidth * (progressPercentage - 0.5) * 2
+                        progressX = fromFrame.origin.x + maxScrollBarWidth - subScrollBarWidth
+                        scrollBarWidth = subScrollBarWidth
+                    }
+                } else {
+                    if progressPercentage <= 0.5 {
+                        let subScrollBarWidth = (self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width) * 2 * progressPercentage
+                        progressX = fromFrame.origin.x - subScrollBarWidth
+                        scrollBarWidth = fromFrame.size.width + subScrollBarWidth
+                    } else {
+                        progressX = toFrame.origin.x
+                        scrollBarWidth = maxScrollBarWidth - (maxScrollBarWidth - toFrame.size.width) * (progressPercentage - 0.5) * 2
+                    }
+                }
+                
+                self.scrollBar.frame = CGRect(x: progressX, y: self.scrollBar.frame.origin.y, width: scrollBarWidth, height: targetFrame.size.height)
+                break
+            case .elastic:                
+                let toFrameCenterX = toFrame.origin.x + self.tabBarOptions.leftPadding + (toFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+                
+                let fromFrameCenterX = fromFrame.origin.x + self.tabBarOptions.leftPadding + (fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
+                
+                self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
+                
+                var scrollBarWidth = fromCell.pjTabBarItem.titleWidth + (toCell.pjTabBarItem.titleWidth - fromCell.pjTabBarItem.titleWidth) * progressPercentage
+                
+                if self.tabBarOptions.maxItemWidth > 0, scrollBarWidth > self.tabBarOptions.maxItemWidth {
+                    scrollBarWidth = self.tabBarOptions.maxItemWidth
+                }
+                
+                self.scrollBar.frame.size.width = scrollBarWidth
+                break
+            }
         }
         
-        let toFrameCenterX = toFrame.origin.x + self.tabBarOptions.leftPadding + (toFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
-        
-        let fromFrameCenterX = fromFrame.origin.x + self.tabBarOptions.leftPadding + (fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
-        
-        self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
-        
-        let scrollBarWidth = fromCell.pjTabBarItem.titleWidth + (toCell.pjTabBarItem.titleWidth - fromCell.pjTabBarItem.titleWidth) * progressPercentage
-        
-        self.scrollBar.frame.size.width = scrollBarWidth
-
-        var targetContentOffset: CGFloat = 0.0
-        if self.collectionView.contentSize.width > self.frame.size.width {
-            let toContentOffset = contentOffsetForCell(withFrame: toFrame, andIndex: toIndex)
-            let fromContentOffset = contentOffsetForCell(withFrame: fromFrame, andIndex: fromIndex)
-
-            targetContentOffset = fromContentOffset + ((toContentOffset - fromContentOffset) * progressPercentage)
+        if self.tabBarOptions.isTabBarCellLinkScrollWhenMoveScrollBar {
+            var targetContentOffset: CGFloat = 0.0
+            if self.collectionView.contentSize.width > self.frame.size.width {
+                let toContentOffset = contentOffsetForCell(withFrame: toFrame, andIndex: toIndex)
+                let fromContentOffset = contentOffsetForCell(withFrame: fromFrame, andIndex: fromIndex)
+                
+                targetContentOffset = fromContentOffset + ((toContentOffset - fromContentOffset) * progressPercentage)
+            }
+            
+            self.collectionView.setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
         }
-
-        self.collectionView.setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
     }
     
     private func contentOffsetForCell(withFrame cellFrame: CGRect, andIndex index: Int) -> CGFloat {

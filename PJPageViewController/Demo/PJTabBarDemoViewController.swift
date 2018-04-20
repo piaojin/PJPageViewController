@@ -37,7 +37,7 @@ class PJTabBarDemoViewController: UIViewController {
         var tabBarViewConfiguration = PJPageOptions()
         tabBarViewConfiguration.leftPadding = 10.0
         tabBarViewConfiguration.rightPadding = 10.0
-        tabBarViewConfiguration.scrollBarColor = .yellow
+        tabBarViewConfiguration.scrollBarColor = .green
 //        tabBarViewConfiguration.maxItemWidth = 100.0
         tabBarViewConfiguration.scrollBarHeigth = 6.0
         tabBarViewConfiguration.titleColor = .red
@@ -65,7 +65,7 @@ class PJTabBarDemoViewController: UIViewController {
         let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
 //        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
         viewController.tabBarViewHeigth = 30.0
-        viewController.currentIndex = 3
+//        viewController.currentIndex = 3
         
         //不带coverView
 //        let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)

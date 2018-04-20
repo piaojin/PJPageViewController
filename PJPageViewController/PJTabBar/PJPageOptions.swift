@@ -8,6 +8,10 @@
 
 import UIKit
 
+public enum MoveScrollBarStyle {
+    case elastic, bounce
+}
+
 public struct PJPageOptions {
     
     public var scrollBarColor: UIColor = .orange
@@ -16,7 +20,17 @@ public struct PJPageOptions {
     
     public var scrollBarConstWidth: CGFloat = 0.0
     
+    public var isScrollBarConstWidth: Bool {
+        return self.scrollBarConstWidth > 0.0
+    }
+    
+    public var isTabBarCellLinkScrollWhenMoveScrollBar = true
+    
     public var minimumInteritemSpacing: CGFloat = 60.0
+    
+    public var moveScrollBarStyle: MoveScrollBarStyle = .bounce
+    
+    public var isScrollBarLinkScrollWhenMovePage = true
     
     /// the size of cell
     public var itemSize: CGSize = .zero
