@@ -40,6 +40,18 @@ open class PJTabBarView: UIView {
     
     open var tabBarOptions: PJPageOptions = PJPageOptions()
     
+    open override var backgroundColor: UIColor? {
+        get {
+            return super.backgroundColor
+        }
+        set {
+            super.backgroundColor = newValue
+            if self.collectionView != nil {
+                self.collectionView.backgroundColor = newValue
+            }
+        }
+    }
+    
     @IBInspectable open var scrollBarHeigth: CGFloat = 2.0 {
         didSet {
             if delegate != nil {
