@@ -9,21 +9,21 @@
 import UIKit
 
 public extension String {
-    public func bridgeObjectiveC() -> NSString {
+    public func pj_bridgeObjectiveC() -> NSString {
         return NSString(string: self)
     }
     
-    public func boundingSizeBySize(_ size: CGSize, font: UIFont) -> CGSize {
+    public func pj_boundingSizeBySize(_ size: CGSize, font: UIFont) -> CGSize {
         if self.isEmpty { return CGSize.zero }
-        return attributedTextConstrainedToSize(NSAttributedString(string: self, attributes: [NSAttributedStringKey.font: font]), size: size, numberOfLines: 0)
+        return pj_attributedTextConstrainedToSize(NSAttributedString(string: self, attributes: [NSAttributedStringKey.font: font]), size: size, numberOfLines: 0)
     }
     
-    public func sizeByAttributes(_ attributes: [NSAttributedStringKey: Any]?) -> CGSize {
-        return self.bridgeObjectiveC().size(withAttributes: attributes)
+    public func pj_sizeByAttributes(_ attributes: [NSAttributedStringKey: Any]?) -> CGSize {
+        return self.pj_bridgeObjectiveC().size(withAttributes: attributes)
     }
 }
 
-public func attributedTextConstrainedToSize(_ attributedText: NSAttributedString, size: CGSize, numberOfLines: Int) -> CGSize {
+public func pj_attributedTextConstrainedToSize(_ attributedText: NSAttributedString, size: CGSize, numberOfLines: Int) -> CGSize {
     if attributedText.length == 0 {
         return CGSize.zero
     }

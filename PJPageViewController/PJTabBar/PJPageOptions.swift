@@ -41,6 +41,10 @@ public struct PJPageOptions {
     
     public var rightPadding: CGFloat = 0.0
     
+    public var leftViewAnchors: (left: CGFloat, top: CGFloat, bottom: CGFloat, width: CGFloat) = (left: 0.0, top: 0.0, bottom: 0.0, width: 0.0)
+    
+    public var rightViewAnchors: (right: CGFloat, top: CGFloat, bottom: CGFloat, width: CGFloat) = (right: 0.0, top: 0.0, bottom: 0.0, width: 0.0)
+    
     public var titleSelectedColor: UIColor = .orange
     
     public var titleColor: UIColor = .black

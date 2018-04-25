@@ -58,7 +58,7 @@ class DemoTableViewController: UIViewController, PJCoverPageViewProtocol {
         
         let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
         viewController.tabBarViewHeigth = 30.0
-        viewController.pjTabBarView.backgroundColor = .green
+        viewController.tabBarView.backgroundColor = .green
         viewController.title = "Has coverView"
         return viewController
     }()

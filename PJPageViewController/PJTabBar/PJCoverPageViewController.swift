@@ -81,7 +81,7 @@ open class PJCoverPageViewController: PJPageViewController {
     override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         self.coverView.frame = CGRect(x: 0.0, y: 0.0, width: size.width, height: self.coverView.frame.size.height)
-        self.pjTabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: size.width, height: self.pjTabBarView.frame.size.height)
+        self.tabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: size.width, height: self.tabBarView.frame.size.height)
     }
     
     //To smooth, I do not use autolayout. So I need to manually adjust the vertical screen.
@@ -134,8 +134,8 @@ public extension PJCoverPageViewController {
         self.coverView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height: self.coverViewHeigth)
         self.topContentView.addSubview(self.coverView)
         
-        self.pjTabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: self.view.frame.size.width, height: self.tabBarViewHeigth)
-        self.view.bringSubview(toFront: self.pjTabBarView)
+        self.tabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: self.view.frame.size.width, height: self.tabBarViewHeigth)
+        self.view.bringSubview(toFront: self.tabBarView)
     }
     
     private func initCoverData() {
@@ -178,7 +178,7 @@ public extension PJCoverPageViewController {
         }
         if self.coverView.frame.size.height != height {
             self.coverView.frame.size.height = height
-            self.pjTabBarView.frame.origin.y = self.coverView.frame.maxY
+            self.tabBarView.frame.origin.y = self.coverView.frame.maxY
         }
     }
     

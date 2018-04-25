@@ -85,7 +85,7 @@ class DemoSectionTableViewController: UIViewController, PJCoverPageViewProtocol 
         
         let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)
         viewController.tabBarViewHeigth = 30.0
-        viewController.pjTabBarView.backgroundColor = .green
+        viewController.tabBarView.backgroundColor = .green
         viewController.title = "No coverView"
         return viewController
     }()

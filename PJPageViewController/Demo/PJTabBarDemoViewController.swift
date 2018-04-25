@@ -44,6 +44,8 @@ class PJTabBarDemoViewController: UIViewController {
         tabBarViewConfiguration.titleSelectedColor = .blue
         tabBarViewConfiguration.autoSetMinimumInteritemSpacingMaxCount = 3
         tabBarViewConfiguration.isAutoSetMinimumInteritemSpacing = true
+//        tabBarViewConfiguration.leftViewAnchors = (left: 0.0, top: 0.0, bottom: 0.0, width: 20.0)
+//        tabBarViewConfiguration.rightViewAnchors = (right: 0.0, top: 0.0, bottom: 0.0, width: 20.0)
 //        tabBarViewConfiguration.sectionInset = UIEdgeInsets(top: 0.0, left: 100.0, bottom: 0.0, right: 100.0)
 //        tabBarViewConfiguration.minimumInteritemSpacing = 200.0
 //        tabBarViewConfiguration.leftPadding = 20.0
@@ -63,9 +65,13 @@ class PJTabBarDemoViewController: UIViewController {
         viewController7.view.backgroundColor = .orange
         
         let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
-//        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
         viewController.tabBarViewHeigth = 30.0
-//        viewController.currentIndex = 3
+//        let leftView = UIView()
+//        leftView.backgroundColor = .orange
+//        let rightView = UIView()
+//        rightView.backgroundColor = .yellow
+//        viewController.tabBarLeftView = leftView
+//        viewController.tabBarRightView = rightView
         
         //不带coverView
 //        let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)

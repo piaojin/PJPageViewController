@@ -27,6 +27,10 @@ public protocol PJTabBarViewCellProtocol: NSObjectProtocol {
     @objc optional func tabBarCellIdentifier() -> String
     ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell. Remember to implement PJTabBarViewCellProtocol for yoor custom cell.
     @objc optional func customCellClass() -> UICollectionViewCell.Type
+    
+    @objc optional func pjTabBarLeftView(_ pjTabBarView: PJTabBarView) -> UIView?
+    
+    @objc optional func pjTabBarRightView(_ pjTabBarView: PJTabBarView) -> UIView?
 }
 
 @IBDesignable
@@ -172,6 +176,7 @@ open class PJTabBarView: UIView {
                     self.items[currentIndex] = tabBarItem
                 }
                 
+                self.addLeftAndRightView()
                 collectionView.reloadData()
             }
         }
@@ -199,9 +204,9 @@ open class PJTabBarView: UIView {
         return scrollBar
     }()
     
-    @IBInspectable open var leftView: UIView?
+    @IBInspectable open weak var leftView: UIView?
     
-    @IBInspectable open var rightView: UIView?
+    @IBInspectable open weak var rightView: UIView?
     
     /// current select item source
     open var currentPhoneTabBarItem: PJTabBarItem?
@@ -250,8 +255,8 @@ open class PJTabBarView: UIView {
         
         self.addSubview(self.collectionView)
         
-        self.collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        self.collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        self.collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: self.tabBarOptions.leftViewAnchors.width).isActive = true
+        self.collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.tabBarOptions.rightViewAnchors.width).isActive = true
         self.collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         self.collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
@@ -331,6 +336,28 @@ open class PJTabBarView: UIView {
         self.setMinimumInteritemSpacing()
         self.collectionView.scrollToItem(at: IndexPath(row: self.currentIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
         self.setUpScrollBarPosition(atIndex: self.currentIndex)
+    }
+    
+    private func addLeftAndRightView() {
+        if self.leftView == nil, let leftView = delegate?.pjTabBarLeftView?(self) {
+            self.leftView = leftView
+            leftView.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview(leftView)
+            self.leftView?.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: self.tabBarOptions.leftViewAnchors.left).isActive = true
+            self.leftView?.topAnchor.constraint(equalTo: self.topAnchor, constant: self.tabBarOptions.leftViewAnchors.top).isActive = true
+            self.leftView?.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -self.tabBarOptions.leftViewAnchors.bottom).isActive = true
+            self.leftView?.widthAnchor.constraint(equalToConstant: self.tabBarOptions.leftViewAnchors.width).isActive = true
+        }
+        
+        if self.rightView == nil, let rightView = delegate?.pjTabBarRightView?(self) {
+            self.rightView = rightView
+            rightView.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview(rightView)
+            self.rightView?.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -self.tabBarOptions.rightViewAnchors.right).isActive = true
+            self.rightView?.topAnchor.constraint(equalTo: self.topAnchor, constant: self.tabBarOptions.rightViewAnchors.top).isActive = true
+            self.rightView?.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -self.tabBarOptions.rightViewAnchors.bottom).isActive = true
+            self.rightView?.widthAnchor.constraint(equalToConstant: self.tabBarOptions.rightViewAnchors.width).isActive = true
+        }
     }
 }
 
@@ -517,7 +544,7 @@ public extension PJTabBarView {
     }
     
     private func sizeForItem(title: String) -> CGSize {
-        let width = title.boundingSizeBySize(CGSize(width: self.tabBarOptions.maxItemWidth == 0.0 ? CGFloat.greatestFiniteMagnitude : self.tabBarOptions.maxItemWidth, height: collectionView.frame.size.height), font: self.tabBarOptions.titleFont).width
+        let width = title.pj_boundingSizeBySize(CGSize(width: self.tabBarOptions.maxItemWidth == 0.0 ? CGFloat.greatestFiniteMagnitude : self.tabBarOptions.maxItemWidth, height: collectionView.frame.size.height), font: self.tabBarOptions.titleFont).width
         return CGSize(width: width + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding, height: collectionView.frame.size.height)
     }
 }

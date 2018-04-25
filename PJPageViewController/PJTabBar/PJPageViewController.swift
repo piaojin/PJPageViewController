@@ -63,7 +63,7 @@ open class PJPageViewController: UIViewController {
     //pageView tabBarView settings
     open var tabBarOptions: PJPageOptions = PJPageOptions() {
         didSet {
-            self.pjTabBarView.tabBarOptions = tabBarOptions
+            self.tabBarView.tabBarOptions = tabBarOptions
         }
     }
     
@@ -75,13 +75,29 @@ open class PJPageViewController: UIViewController {
         return viewController
     }()
     
-    open lazy var pjTabBarView: PJTabBarView = {
+    open lazy var tabBarView: PJTabBarView = {
         let bar = PJTabBarView(tabBarOptions: self.tabBarOptions)
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
         bar.delegate = self
         return bar
     }()
+    
+    open var tabBarLeftView: UIView? {
+        didSet {
+            if tabBarLeftView != nil {
+                self.tabBarView.delegate = self
+            }
+        }
+    }
+    
+    open var tabBarRightView: UIView? {
+        didSet {
+            if tabBarRightView != nil {
+                self.tabBarView.delegate = self
+            }
+        }
+    }
     
     // use topContentView to adapter screen rotation.
     open var topContentView: PJTopContentView = {
@@ -149,7 +165,7 @@ open class PJPageViewController: UIViewController {
 
     override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        self.pjTabBarView.frame = CGRect(x: 0.0, y: 0.0, width: size.width, height: self.pjTabBarView.frame.size.height)
+        self.tabBarView.frame = CGRect(x: 0.0, y: 0.0, width: size.width, height: self.tabBarView.frame.size.height)
     }
 }
 
@@ -184,8 +200,8 @@ public extension PJPageViewController {
         }
         
         //Use frame layout for smooth frames.
-        self.pjTabBarView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height: self.tabBarViewHeigth)
-        self.topContentView.addSubview(self.pjTabBarView)
+        self.tabBarView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height: self.tabBarViewHeigth)
+        self.topContentView.addSubview(self.tabBarView)
     }
     
     private func initData() {
@@ -194,7 +210,7 @@ public extension PJPageViewController {
             [weak self] (finished) in
             if let `self` = self {
                 self.pageCompletion?(finished, 0)
-                self.pjTabBarView.currentIndex = self.currentIndex
+                self.tabBarView.currentIndex = self.currentIndex
             }
         })
     }
@@ -224,15 +240,13 @@ extension PJPageViewController: UIScrollViewDelegate {
             return
         }
         
-        if self.pjTabBarView.frame == .zero {
+        if self.tabBarView.frame == .zero {
             return
         }
         
         let direction: PJSwipeDirection = scrollView.contentOffset.x >= self.lastContentOffsetX ? .left : .right
         
         let (fromIndex, toIndex, scrollPercentage) = self.caculateIndexProgress(offsetX: scrollView.contentOffset.x, direction: direction)
-        
-//        print("fromIndex: \(fromIndex), toIndex: \(toIndex), progressPercentage: \(scrollPercentage), offsetX: \(scrollView.contentOffset.x), swipeDirection: \(swipeDirection), currentIndex: \(currentIndex)")
         
         if fromIndex == -1, toIndex == fromIndex {
             return
@@ -244,7 +258,7 @@ extension PJPageViewController: UIScrollViewDelegate {
         
         if toIndex < self.viewControllerCount, toIndex >= 0, fromIndex < self.viewControllerCount, fromIndex >= 0 {
             if !self.didFinishAnimating {
-                self.pjTabBarView.moveScrollBar(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: scrollPercentage)
+                self.tabBarView.moveScrollBar(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: scrollPercentage)
             } else {
                 self.didFinishAnimating = false
             }
@@ -330,13 +344,13 @@ extension PJPageViewController: UIPageViewControllerDelegate {
             let index = Int(self.pageScrollView.contentOffset.x / self.pageScrollView.frame.size.width) - 1
             if index != 0 {
                 self.currentIndex = self.currentIndex + index
-                if self.pjTabBarView.currentIndex != self.currentIndex {
-                    self.pjTabBarView.currentIndex = self.currentIndex
+                if self.tabBarView.currentIndex != self.currentIndex {
+                    self.tabBarView.currentIndex = self.currentIndex
                 }
                 if !self.tabBarOptions.isNeedScrollBar {
-                    self.pjTabBarView.scrollToItem(at: self.currentIndex)
+                    self.tabBarView.scrollToItem(at: self.currentIndex)
                 } else if self.scrollBarScrollType != .linkage {
-                    self.pjTabBarView.scrollToItem(at: self.currentIndex)
+                    self.tabBarView.scrollToItem(at: self.currentIndex)
                 }
             }
         }
@@ -377,6 +391,14 @@ extension PJPageViewController: PJTabBarViewDelegate {
             self?.pageCompletion?(finished, 0)
             self?.isClickTabBarView = false
         })
+    }
+    
+    public func pjTabBarLeftView(_ pjTabBarView: PJTabBarView) -> UIView? {
+        return self.tabBarLeftView
+    }
+    
+    public func pjTabBarRightView(_ pjTabBarView: PJTabBarView) -> UIView? {
+        return self.tabBarRightView
     }
 }
 

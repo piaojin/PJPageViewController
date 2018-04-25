@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PJPageViewController/PJTabBar/PJTabBarView.swift"
-            timestampString = "546318366.281976"
+            timestampString = "546332115.059759"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "402"
-            endingLineNumber = "402"
-            landmarkName = "collectionView(_:layout:sizeForItemAt:)"
+            startingLineNumber = "536"
+            endingLineNumber = "536"
+            landmarkName = "updateSelectItem(newIndex:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,14 +25,30 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "PJPageViewController/PJTabBar/PJTabBarView.swift"
-            timestampString = "546318366.282298"
+            filePath = "PJPageViewController/PJTabBar/PJPageViewController.swift"
+            timestampString = "546332115.059833"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "393"
-            endingLineNumber = "393"
-            landmarkName = "collectionView(_:layout:sizeForItemAt:)"
-            landmarkType = "7">
+            startingLineNumber = "88"
+            endingLineNumber = "88"
+            landmarkName = "tabBarLeftView"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PJPageViewController/PJTabBar/PJPageViewController.swift"
+            timestampString = "546332115.060147"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "96"
+            endingLineNumber = "96"
+            landmarkName = "tabBarRightView"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -42,13 +58,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PJPageViewController/PJTabBar/PJTabBarView.swift"
-            timestampString = "546318366.282515"
+            timestampString = "546332115.060403"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "518"
-            endingLineNumber = "518"
-            landmarkName = "PJTabBarView"
-            landmarkType = "21">
+            startingLineNumber = "169"
+            endingLineNumber = "169"
+            landmarkName = "delegate"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
