@@ -8,22 +8,22 @@
 
 import UIKit
 
-enum PJCoverPageViewScrollType {
+public enum PJCoverPageViewScrollType {
     case forbiddenScroll
     case linkageScroll
 }
 
-protocol PJCoverPageViewProtocol: class {
+public protocol PJCoverPageViewProtocol: class {
     func scrollView() -> UIScrollView?
 }
 
-class PJCoverPageViewController: PJPageViewController {
+open class PJCoverPageViewController: PJPageViewController {
 
     private var kScrollViewConText = 0
     
     private static let kScrollViewKeyPath = "contentOffset"
     
-    public var coverPageViewScrollType: PJCoverPageViewScrollType = .linkageScroll
+    open var coverPageViewScrollType: PJCoverPageViewScrollType = .linkageScroll
     
     private var subViewControllerScrollViews: [UIViewController : UIScrollView] = [:]
     
@@ -31,7 +31,7 @@ class PJCoverPageViewController: PJPageViewController {
     
     private var currentContentOffsetY: CGFloat = 0.0
     
-    public var coverViewHeigth: CGFloat = 60.0
+    open var coverViewHeigth: CGFloat = 60.0
     
     private var coverViewY: CGFloat {
         get {
@@ -41,7 +41,7 @@ class PJCoverPageViewController: PJPageViewController {
         }
     }
     
-    public var coverView: UIView!
+    open var coverView: UIView!
     
     convenience public init(viewControllers: [UIViewController], coverView: UIView, coverPageViewScrollType: PJCoverPageViewScrollType = .linkageScroll) {
         self.init(viewControllers: viewControllers, coverView: coverView, coverPageViewScrollType: coverPageViewScrollType, tabBarViewConfiguration: PJPageOptions())
@@ -67,27 +67,26 @@ class PJCoverPageViewController: PJPageViewController {
         self.tabBarOptions = tabBarViewConfiguration
     }
     
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.initCoverView()
         self.initCoverData()
     }
 
-    override func didReceiveMemoryWarning() {
+    override open func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         self.coverView.frame = CGRect(x: 0.0, y: 0.0, width: size.width, height: self.coverView.frame.size.height)
         self.pjTabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: size.width, height: self.pjTabBarView.frame.size.height)
     }
     
     //To smooth, I do not use autolayout. So I need to manually adjust the vertical screen.
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == PJCoverPageViewController.kScrollViewKeyPath, context == &self.kScrollViewConText, let scrollView = object as? UIScrollView, let newValue = change?[NSKeyValueChangeKey.newKey] as? CGPoint, let oldValue = change?[NSKeyValueChangeKey.oldKey] as? CGPoint {
-//            print("new: \(newValue), old: \(oldValue)")
             guard let index = scrollView.pj_scrollViewIndex else {
                 return
             }
@@ -128,7 +127,7 @@ class PJCoverPageViewController: PJPageViewController {
     }
 }
 
-extension PJCoverPageViewController {
+public extension PJCoverPageViewController {
     private func initCoverView() {
         self.topContentViewHeight.constant = self.coverViewHeigth + self.tabBarViewHeigth
         self.coverView.translatesAutoresizingMaskIntoConstraints = true
@@ -198,8 +197,8 @@ extension PJCoverPageViewController {
 }
 
 // MARK: PJTabBarViewDelegate
-extension PJCoverPageViewController {
-    override func pjTabBarWillChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int) {
+public extension PJCoverPageViewController {
+    override public func pjTabBarWillChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int) {
         super.pjTabBarWillChange(pjTabBarView, fromIndex: fromIndex, toIndex: toIndex)
         let toViewController = self.viewControllers[toIndex]
         if toViewController is PJCoverPageViewProtocol, let coverPageViewProtocol = toViewController as? PJCoverPageViewProtocol, let scrollView = coverPageViewProtocol.scrollView() {
@@ -227,7 +226,7 @@ extension PJCoverPageViewController {
     }
 }
 
-extension UIScrollView {
+public extension UIScrollView {
     private struct AssociatedKeys {
         static var pj_scrollViewIndex = "pj_scrollViewIndex"
     }

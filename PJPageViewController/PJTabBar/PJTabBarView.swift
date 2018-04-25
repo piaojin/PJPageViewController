@@ -46,9 +46,7 @@ open class PJTabBarView: UIView {
         }
         set {
             super.backgroundColor = newValue
-            if self.collectionView != nil {
-                self.collectionView.backgroundColor = newValue
-            }
+            self.collectionView.backgroundColor = newValue
         }
     }
     
@@ -105,12 +103,12 @@ open class PJTabBarView: UIView {
             if oldIndex < count, oldIndex >= 0 {
                 if let oldTabBarItem = self.items[oldIndex] {
                     oldTabBarItem.isSelect = false
-                    collectionView?.reloadItems(at: [IndexPath(row: oldIndex, section: 0)])
+                    collectionView.reloadItems(at: [IndexPath(row: oldIndex, section: 0)])
                 }
             }
             
-            collectionView?.reloadItems(at: [IndexPath(row: newIndex, section: 0)])
-            collectionView?.scrollToItem(at: IndexPath(row: newIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
+            collectionView.reloadItems(at: [IndexPath(row: newIndex, section: 0)])
+            collectionView.scrollToItem(at: IndexPath(row: newIndex, section: 0), at: self.tabBarOptions.scrollPosition, animated: true)
             self.setUpScrollBarPosition(atIndex: newIndex)
         }
     }
@@ -126,28 +124,28 @@ open class PJTabBarView: UIView {
     @IBInspectable open var titleSelectedColor: UIColor = .blue {
         didSet {
             self.tabBarOptions.titleSelectedColor = titleSelectedColor
-            collectionView?.reloadData()
+            collectionView.reloadData()
         }
     }
     
     @IBInspectable open var titleColor: UIColor = .black {
         didSet {
             self.tabBarOptions.titleColor = titleColor
-            collectionView?.reloadData()
+            collectionView.reloadData()
         }
     }
     
     @IBInspectable open var titleAlpha: CGFloat = 0.4 {
         didSet {
             self.tabBarOptions.titleAlpha = titleAlpha
-            collectionView?.reloadData()
+            collectionView.reloadData()
         }
     }
     
     @IBInspectable open var titleSelectedAlpha: CGFloat = 1.0 {
         didSet {
             self.tabBarOptions.titleSelectedAlpha = titleSelectedAlpha
-            collectionView?.reloadData()
+            collectionView.reloadData()
         }
     }
     
@@ -157,7 +155,7 @@ open class PJTabBarView: UIView {
                 pjTabBarItem.cellSize = .zero
             }
             self.tabBarOptions.titleFont = titleFont
-            collectionView?.reloadData()
+            collectionView.reloadData()
             setUpScrollBarPosition(atIndex: currentIndex)
         }
     }
@@ -174,7 +172,7 @@ open class PJTabBarView: UIView {
                     self.items[currentIndex] = tabBarItem
                 }
                 
-                collectionView?.reloadData()
+                collectionView.reloadData()
             }
         }
     }
@@ -186,8 +184,24 @@ open class PJTabBarView: UIView {
             self.collectionView.reloadData()
         }
     }
-    @IBInspectable open var collectionView: UICollectionView!
-    @IBInspectable open var scrollBar: UIView!
+    
+    @IBInspectable open lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.flowLayout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = self.backgroundColor
+        return collectionView
+    }()
+    
+    @IBInspectable open lazy var scrollBar: UIView = {
+        let scrollBar = UIView()
+        scrollBar.backgroundColor = self.tabBarOptions.scrollBarColor
+        return scrollBar
+    }()
+    
+    @IBInspectable open var leftView: UIView?
+    
+    @IBInspectable open var rightView: UIView?
     
     /// current select item source
     open var currentPhoneTabBarItem: PJTabBarItem?
@@ -231,28 +245,21 @@ open class PJTabBarView: UIView {
     /// init subViews
     private func initSubViews() {
         self.backgroundColor = .white
-        flowLayout.scrollDirection = .horizontal
-        flowLayout.sectionInset = self.tabBarOptions.sectionInset
+        self.flowLayout.scrollDirection = .horizontal
+        self.flowLayout.sectionInset = self.tabBarOptions.sectionInset
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(self.collectionView)
         
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = self.backgroundColor
-        self.addSubview(collectionView)
-        
-        collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-        collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        self.collectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        self.collectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        self.collectionView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        self.collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
         if self.tabBarOptions.isNeedScrollBar {
-            scrollBar = UIView()
-            scrollBar.backgroundColor = self.tabBarOptions.scrollBarColor
-            collectionView.addSubview(scrollBar)
+            self.collectionView.addSubview(self.scrollBar)
         }
         if #available(iOS 11.0, *) {
-            collectionView.contentInsetAdjustmentBehavior = .never
+            self.collectionView.contentInsetAdjustmentBehavior = .never
         }
         
         if self.tabBarOptions.isAutoSetMinimumInteritemSpacing {
@@ -538,7 +545,7 @@ public extension PJTabBarView {
         let pjTabBarItem = self.items[atIndex]
         pjTabBarItem?.title = title
         pjTabBarItem?.cellSize = self.sizeForItem(title: title)
-        collectionView?.reloadItems(at: [IndexPath(row: atIndex, section: 0)])
+        collectionView.reloadItems(at: [IndexPath(row: atIndex, section: 0)])
         if currentIndex == atIndex {
             setUpScrollBarPosition(atIndex: atIndex)
         }
@@ -548,7 +555,7 @@ public extension PJTabBarView {
         if !self.tabBarOptions.isNeedScrollBar {
             return
         }
-        if let attr = collectionView?.layoutAttributesForItem(at: IndexPath(row: atIndex, section: 0)), let title = delegate?.pjTabBar(self, pjTabBarItemAt: atIndex), let pjTabBarItem = self.items[atIndex] {
+        if let attr = collectionView.layoutAttributesForItem(at: IndexPath(row: atIndex, section: 0)), let title = delegate?.pjTabBar(self, pjTabBarItemAt: atIndex), let pjTabBarItem = self.items[atIndex] {
             
             var scrollBarWidth: CGFloat = pjTabBarItem.cellSize.width
             if scrollBarWidth == 0.0 {

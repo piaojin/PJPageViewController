@@ -61,13 +61,13 @@ open class PJPageViewController: UIViewController {
     public var setPageOptionsClosure: SetPageOptionsClosure?
     
     //pageView tabBarView settings
-    public var tabBarOptions: PJPageOptions = PJPageOptions() {
+    open var tabBarOptions: PJPageOptions = PJPageOptions() {
         didSet {
             self.pjTabBarView.tabBarOptions = tabBarOptions
         }
     }
     
-    public lazy var pageViewController: UIPageViewController = {
+    open lazy var pageViewController: UIPageViewController = {
         let viewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         viewController.view.translatesAutoresizingMaskIntoConstraints = false
         viewController.delegate = self
@@ -75,7 +75,7 @@ open class PJPageViewController: UIViewController {
         return viewController
     }()
     
-    public lazy var pjTabBarView: PJTabBarView = {
+    open lazy var pjTabBarView: PJTabBarView = {
         let bar = PJTabBarView(tabBarOptions: self.tabBarOptions)
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
@@ -84,7 +84,7 @@ open class PJPageViewController: UIViewController {
     }()
     
     // use topContentView to adapter screen rotation.
-    var topContentView: PJTopContentView = {
+    open var topContentView: PJTopContentView = {
         let topContentView = PJTopContentView()
         topContentView.translatesAutoresizingMaskIntoConstraints = false
         topContentView.backgroundColor = .clear
@@ -92,28 +92,28 @@ open class PJPageViewController: UIViewController {
         return topContentView
     }()
     
-    var topContentViewHeight: NSLayoutConstraint!
+    open var topContentViewHeight: NSLayoutConstraint!
     
-    public weak var pageScrollView: UIScrollView!
+    open weak var pageScrollView: UIScrollView!
     
-    public var viewControllers: [UIViewController] = []
+    open var viewControllers: [UIViewController] = []
     
-    public var titles: [String] = []
+    open var titles: [String] = []
     
-    public var currentIndex: Int = 0 {
+    open var currentIndex: Int = 0 {
         didSet {
             assert(currentIndex <= self.viewControllers.count - 1 && currentIndex >= 0 , "PJPageViewController: currentIndex out of bounds")
         }
     }
     
-    public var currentViewController: UIViewController! {
+    open var currentViewController: UIViewController! {
         return self.viewControllers[self.currentIndex]
     }
     
-    public var isPageScrollEnabled: Bool = true
+    open var isPageScrollEnabled: Bool = true
     
     //lock vertical or horizontal scrolling while dragging
-    public var pageBounces: Bool = true
+    open var pageBounces: Bool = true
     
     convenience public init(viewControllers: [UIViewController]) {
         self.init(viewControllers: viewControllers, tabBarOptions: PJPageOptions())
