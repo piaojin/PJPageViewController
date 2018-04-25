@@ -636,7 +636,8 @@ public extension PJTabBarView {
             
             self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
         } else {
-            let maxScrollBarWidth = fromFrame.size.width + self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width
+            let maxScrollBarWidth = fromFrame.size.width - self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing - self.tabBarOptions.leftPadding + toFrame.size.width
+            let maxSubScrollBarWidth = maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.rightPadding + self.tabBarOptions.leftPadding
             switch self.tabBarOptions.moveScrollBarStyle {
             case .bounce:
                 var progressX: CGFloat = 0.0
@@ -644,21 +645,20 @@ public extension PJTabBarView {
                 if fromFrame.origin.x < toFrame.origin.x {
                     if progressPercentage <= 0.5 {
                         progressX = fromFrame.origin.x + self.tabBarOptions.leftPadding
-                        scrollBarWidth = fromFrame.size.width + (self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width) * 2 * progressPercentage
+                        scrollBarWidth = fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding + (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage
                     } else {
-                        let maxSubScrollBarWidth = maxScrollBarWidth - toFrame.size.width
                         let subScrollBarWidth = maxScrollBarWidth - maxSubScrollBarWidth * (progressPercentage - 0.5) * 2
-                        progressX = fromFrame.origin.x + maxScrollBarWidth - subScrollBarWidth
+                        progressX = fromFrame.origin.x + maxScrollBarWidth - subScrollBarWidth + self.tabBarOptions.leftPadding
                         scrollBarWidth = subScrollBarWidth
                     }
                 } else {
                     if progressPercentage <= 0.5 {
-                        let subScrollBarWidth = (self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing + self.tabBarOptions.leftPadding + toFrame.size.width) * 2 * progressPercentage
-                        progressX = fromFrame.origin.x - subScrollBarWidth
-                        scrollBarWidth = fromFrame.size.width + subScrollBarWidth
+                        let subScrollBarWidth = (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage
+                        scrollBarWidth = fromFrame.size.width + subScrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding
+                        progressX = fromFrame.origin.x - (scrollBarWidth - fromFrame.size.width + self.tabBarOptions.rightPadding)
                     } else {
-                        progressX = toFrame.origin.x
-                        scrollBarWidth = maxScrollBarWidth - (maxScrollBarWidth - toFrame.size.width) * (progressPercentage - 0.5) * 2
+                        progressX = toFrame.origin.x + self.tabBarOptions.leftPadding
+                        scrollBarWidth = maxScrollBarWidth - (maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding) * (progressPercentage - 0.5) * 2
                     }
                 }
                 
