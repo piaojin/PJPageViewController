@@ -37,6 +37,7 @@ class PJTabBarDemoViewController: UIViewController {
         var tabBarViewConfiguration = PJPageOptions()
 //        tabBarViewConfiguration.leftPadding = 10.0
 //        tabBarViewConfiguration.rightPadding = 20.0
+//        tabBarViewConfiguration.scrollBarExtraWidth = 10.0
         tabBarViewConfiguration.scrollBarColor = .green
 //        tabBarViewConfiguration.maxItemWidth = 100.0
         tabBarViewConfiguration.scrollBarHeigth = 6.0

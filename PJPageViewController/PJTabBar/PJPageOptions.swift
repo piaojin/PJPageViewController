@@ -18,7 +18,11 @@ public struct PJPageOptions {
     
     public var scrollBarHeigth: CGFloat = 4.0
     
+    // Set the fixed width of scrollBar
     public var scrollBarConstWidth: CGFloat = 0.0
+    
+    // scrollBar Width is the same as tabBar title width by default. If you want to increase on the basis of title width, set it up.
+    public var scrollBarExtraWidth: CGFloat = 0.0
     
     public var isScrollBarConstWidth: Bool {
         return self.scrollBarConstWidth > 0.0
@@ -37,12 +41,16 @@ public struct PJPageOptions {
     
     public var sectionInset: UIEdgeInsets = .zero
     
+    // tabBar left Padding
     public var leftPadding: CGFloat = 0.0
     
+    // tabBar right Padding
     public var rightPadding: CGFloat = 0.0
     
+    // tabBar left custom view frame
     public var leftViewAnchors: (left: CGFloat, top: CGFloat, bottom: CGFloat, width: CGFloat) = (left: 0.0, top: 0.0, bottom: 0.0, width: 0.0)
     
+    // tabBar right custom view frame
     public var rightViewAnchors: (right: CGFloat, top: CGFloat, bottom: CGFloat, width: CGFloat) = (right: 0.0, top: 0.0, bottom: 0.0, width: 0.0)
     
     public var titleSelectedColor: UIColor = .orange
@@ -72,9 +80,11 @@ public struct PJPageOptions {
     
     public var isNeedScrollBar = true
     
+    // set minimumInteritemSpacing automatically
     public var isAutoSetMinimumInteritemSpacing = true
     
     public var autoSetMinimumInteritemSpacingMaxCount: Int = 3
     
+    // is set title's gradient when move scrollBar
     public var isTitleGradient = true
 }

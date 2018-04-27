@@ -25,7 +25,7 @@ public protocol PJTabBarViewCellProtocol: NSObjectProtocol {
     
     ///this is important for PJTabBarView to create a new cell, if you want set custom cell.
     @objc optional func tabBarCellIdentifier() -> String
-    ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell. Remember to implement PJTabBarViewCellProtocol for yoor custom cell.
+    ///this is important for PJTabBarView to register a new type of cell, if you want set custom cell. Remember to implement PJTabBarViewCellProtocol for your custom cell.
     @objc optional func customCellClass() -> UICollectionViewCell.Type
     
     @objc optional func pjTabBarLeftView(_ pjTabBarView: PJTabBarView) -> UIView?
@@ -592,10 +592,10 @@ public extension PJTabBarView {
             if self.tabBarOptions.scrollBarConstWidth != 0.0 {
                 scrollBarWidth = self.tabBarOptions.scrollBarConstWidth
             }
-            scrollBarWidth = scrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding
-            if scrollBarWidth > attr.frame.size.width {
-                scrollBarWidth = attr.frame.size.width
-            }
+            scrollBarWidth = scrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding + self.tabBarOptions.scrollBarExtraWidth
+//            if scrollBarWidth > attr.frame.size.width {
+//                scrollBarWidth = attr.frame.size.width
+//            }
             self.scrollBar.frame.size = CGSize(width: scrollBarWidth, height: self.tabBarOptions.scrollBarHeigth)
             let scrollBarY = collectionView.frame.size.height - self.scrollBar.frame.size.height / 2.0
             let scrollBarCenterX = self.tabBarOptions.leftPadding + (attr.bounds.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
@@ -627,13 +627,7 @@ public extension PJTabBarView {
 
         if self.tabBarOptions.isTitleGradient {
             //change title color by progressPercentage
-            var narR: CGFloat = 0, narG: CGFloat = 0, narB: CGFloat = 0, narA: CGFloat = 1
-            self.tabBarOptions.titleColor.getRed(&narR, green: &narG, blue: &narB, alpha: &narA)
-            var selR: CGFloat = 0, selG: CGFloat = 0, selB: CGFloat = 0, selA: CGFloat = 1
-            self.tabBarOptions.titleSelectedColor.getRed(&selR, green: &selG, blue: &selB, alpha: &selA)
-            let detalR = narR - selR , detalG = narG - selG, detalB = narB - selB, detalA = narA - selA
-            fromCell.titleLabel.textColor = UIColor(red: selR + detalR * progressPercentage, green: selG + detalG * progressPercentage, blue: selB + detalB * progressPercentage, alpha: selA + detalA * progressPercentage)
-            toCell.titleLabel.textColor = UIColor(red: narR - detalR * progressPercentage, green: narG - detalG * progressPercentage, blue: narB - detalB * progressPercentage, alpha: narA - detalA * progressPercentage)
+            self.updateTabBarTitle(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: progressPercentage)
         }
         
         var toFrame: CGRect
@@ -670,29 +664,29 @@ public extension PJTabBarView {
             
             self.scrollBar.center = CGPoint(x: fromFrameCenterX + (toFrameCenterX - fromFrameCenterX) * progressPercentage, y: self.scrollBar.center.y)
         } else {
-            let maxScrollBarWidth = fromFrame.size.width - self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing - self.tabBarOptions.leftPadding + toFrame.size.width
-            let maxSubScrollBarWidth = maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.rightPadding + self.tabBarOptions.leftPadding
+            let maxScrollBarWidth = fromFrame.size.width - self.tabBarOptions.rightPadding + self.tabBarOptions.minimumInteritemSpacing - self.tabBarOptions.leftPadding + toFrame.size.width + self.tabBarOptions.scrollBarExtraWidth
+            let maxSubScrollBarWidth = maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.rightPadding + self.tabBarOptions.leftPadding - self.tabBarOptions.scrollBarExtraWidth
             switch self.tabBarOptions.moveScrollBarStyle {
             case .bounce:
                 var progressX: CGFloat = 0.0
                 var scrollBarWidth: CGFloat = self.scrollBar.frame.size.width
                 if fromFrame.origin.x < toFrame.origin.x {
                     if progressPercentage <= 0.5 {
-                        progressX = fromFrame.origin.x + self.tabBarOptions.leftPadding
-                        scrollBarWidth = fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding + (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage
+                        progressX = fromFrame.origin.x + self.tabBarOptions.leftPadding - self.tabBarOptions.scrollBarExtraWidth / 2.0
+                        scrollBarWidth = fromFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding + (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage + self.tabBarOptions.scrollBarExtraWidth
                     } else {
                         let subScrollBarWidth = maxScrollBarWidth - maxSubScrollBarWidth * (progressPercentage - 0.5) * 2
-                        progressX = fromFrame.origin.x + maxScrollBarWidth - subScrollBarWidth + self.tabBarOptions.leftPadding
+                        progressX = fromFrame.origin.x + maxScrollBarWidth - subScrollBarWidth + self.tabBarOptions.leftPadding - self.tabBarOptions.scrollBarExtraWidth / 2.0
                         scrollBarWidth = subScrollBarWidth
                     }
                 } else {
                     if progressPercentage <= 0.5 {
-                        let subScrollBarWidth = (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage
-                        scrollBarWidth = fromFrame.size.width + subScrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding
-                        progressX = fromFrame.origin.x - (scrollBarWidth - fromFrame.size.width + self.tabBarOptions.rightPadding)
+                        let subScrollBarWidth = (self.tabBarOptions.minimumInteritemSpacing + toFrame.size.width) * 2 * progressPercentage + self.tabBarOptions.scrollBarExtraWidth / 2.0
+                        scrollBarWidth = fromFrame.size.width + subScrollBarWidth - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding + self.tabBarOptions.scrollBarExtraWidth / 2.0
+                        progressX = fromFrame.origin.x - (scrollBarWidth - fromFrame.size.width + self.tabBarOptions.rightPadding - self.tabBarOptions.scrollBarExtraWidth / 2.0)
                     } else {
-                        progressX = toFrame.origin.x + self.tabBarOptions.leftPadding
-                        scrollBarWidth = maxScrollBarWidth - (maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding) * (progressPercentage - 0.5) * 2
+                        progressX = toFrame.origin.x + self.tabBarOptions.leftPadding - self.tabBarOptions.scrollBarExtraWidth / 2.0
+                        scrollBarWidth = maxScrollBarWidth - (maxScrollBarWidth - toFrame.size.width + self.tabBarOptions.leftPadding + self.tabBarOptions.rightPadding - self.tabBarOptions.scrollBarExtraWidth) * (progressPercentage - 0.5) * 2
                     }
                 }
                 
@@ -727,6 +721,23 @@ public extension PJTabBarView {
             
             self.collectionView.setContentOffset(CGPoint(x: targetContentOffset, y: 0), animated: false)
         }
+    }
+    
+    private func updateTabBarTitle(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat) {
+        let cells = cellForItems(at: [IndexPath(row: fromIndex, section: 0), IndexPath(row: toIndex, section: 0)], reloadIfNotVisible: true)
+        
+        guard cells.count == 2, let fromCell = cells.first as? PJTabBarCell, let toCell = cells.last as? PJTabBarCell else {
+            return
+        }
+        
+        //change title color by progressPercentage
+        var narR: CGFloat = 0, narG: CGFloat = 0, narB: CGFloat = 0, narA: CGFloat = 1
+        self.tabBarOptions.titleColor.getRed(&narR, green: &narG, blue: &narB, alpha: &narA)
+        var selR: CGFloat = 0, selG: CGFloat = 0, selB: CGFloat = 0, selA: CGFloat = 1
+        self.tabBarOptions.titleSelectedColor.getRed(&selR, green: &selG, blue: &selB, alpha: &selA)
+        let detalR = narR - selR , detalG = narG - selG, detalB = narB - selB, detalA = narA - selA
+        fromCell.titleLabel.textColor = UIColor(red: selR + detalR * progressPercentage, green: selG + detalG * progressPercentage, blue: selB + detalB * progressPercentage, alpha: selA + detalA * progressPercentage)
+        toCell.titleLabel.textColor = UIColor(red: narR - detalR * progressPercentage, green: narG - detalG * progressPercentage, blue: narB - detalB * progressPercentage, alpha: narA - detalA * progressPercentage)
     }
     
     private func contentOffsetForCell(withFrame cellFrame: CGRect, andIndex index: Int) -> CGFloat {
