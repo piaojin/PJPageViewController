@@ -36,7 +36,7 @@ public extension PJNavBarPageViewController {
         } else {
             assertionFailure("⚠️: There is not have navigationBar!")
         }
-        self.topContentViewHeight.constant = 0.0
+        self.topContentViewHeight?.constant = 0.0
         self.pageViewTopConstraint?.constant = 0.0
     }
 }

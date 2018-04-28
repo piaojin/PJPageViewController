@@ -110,7 +110,7 @@ open class PJPageViewController: UIViewController {
         return topContentView
     }()
     
-    open var topContentViewHeight: NSLayoutConstraint!
+    open var topContentViewHeight: NSLayoutConstraint?
     
     open weak var pageScrollView: UIScrollView!
     
@@ -196,7 +196,7 @@ public extension PJPageViewController {
         self.topContentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.topContentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.topContentViewHeight = self.topContentView.heightAnchor.constraint(equalToConstant: self.tabBarViewHeigth)
-        self.topContentViewHeight.isActive = true
+        self.topContentViewHeight?.isActive = true
         if #available(iOS 11.0, *) {
             self.topContentView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         } else {

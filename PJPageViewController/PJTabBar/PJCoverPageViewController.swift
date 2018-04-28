@@ -129,7 +129,7 @@ open class PJCoverPageViewController: PJPageViewController {
 
 public extension PJCoverPageViewController {
     private func initCoverView() {
-        self.topContentViewHeight.constant = self.coverViewHeigth + self.tabBarViewHeigth
+        self.topContentViewHeight?.constant = self.coverViewHeigth + self.tabBarViewHeigth
         self.coverView.translatesAutoresizingMaskIntoConstraints = true
         self.coverView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height: self.coverViewHeigth)
         self.topContentView.addSubview(self.coverView)
