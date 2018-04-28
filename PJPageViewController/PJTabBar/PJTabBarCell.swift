@@ -18,6 +18,7 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
+        label.backgroundColor = .black
         return label
     }()
     
@@ -47,6 +48,7 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
 public extension PJTabBarCell {
     
     private func initView() {
+        self.backgroundColor = .red
         self.contentView.addSubview(self.titleLabel)
         self.titleLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
         self.titleLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
