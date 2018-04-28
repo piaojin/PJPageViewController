@@ -50,9 +50,7 @@ class PJTabBarDemoViewController: UIViewController {
 //        tabBarViewConfiguration.rightViewAnchors = (right: 0.0, top: 0.0, bottom: 0.0, width: 20.0)
 //        tabBarViewConfiguration.sectionInset = UIEdgeInsets(top: 0.0, left: 100.0, bottom: 0.0, right: 100.0)
 //        tabBarViewConfiguration.minimumInteritemSpacing = 200.0
-//        tabBarViewConfiguration.leftPadding = 20.0
-//        tabBarViewConfiguration.rightPadding = 10.0
-//        tabBarViewConfiguration.itemSize = CGSize(width: 60.0, height: 30.0)
+//        tabBarViewConfiguration.itemSize = CGSize(width: 80.0, height: 30.0)
         
         let viewController5 = TestViewController()
         viewController5.title = "viewController5"
