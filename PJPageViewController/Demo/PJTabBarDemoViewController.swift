@@ -64,8 +64,8 @@ class PJTabBarDemoViewController: UIViewController {
         viewController7.title = "viewController7"
         viewController7.view.backgroundColor = .orange
         
-        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
-        viewController.tabBarViewHeigth = 30.0
+//        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
+//        viewController.tabBarViewHeigth = 30.0
 //        let leftView = UIView()
 //        leftView.backgroundColor = .orange
 //        let rightView = UIView()
@@ -77,6 +77,10 @@ class PJTabBarDemoViewController: UIViewController {
 //        let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)
 //        viewController.tabBarViewHeigth = 30.0
 //        viewController.currentIndex = 3
+        
+        let viewController = PJNavBarPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7])
+        viewController.tabBarViewHeigth = 30.0
+        viewController.isTabBarHeightEqualToNavBar = false
         
         return viewController
     }()

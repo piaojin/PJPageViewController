@@ -11,6 +11,7 @@
 		7633EB252063774300F9295F /* DemoSectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7633EB242063774300F9295F /* DemoSectionTableViewController.swift */; };
 		7633EB2C2064B7A600F9295F /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7633EB2B2064B7A500F9295F /* String+Extension.swift */; };
 		7633EB2E2064B88200F9295F /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7633EB2D2064B88200F9295F /* TestViewController.swift */; };
+		7660D3722094779E002494A6 /* PJNavBarPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7660D3712094779E002494A6 /* PJNavBarPageViewController.swift */; };
 		769882972021F29800DCE264 /* PJCoverPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769882962021F29800DCE264 /* PJCoverPageViewController.swift */; };
 		769882F420274E4500DCE264 /* DemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769882F320274E4500DCE264 /* DemoTableViewController.swift */; };
 		CA43DC582018BB5600085D8A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA43DC572018BB5600085D8A /* AppDelegate.swift */; };
@@ -50,6 +51,7 @@
 		7633EB242063774300F9295F /* DemoSectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSectionTableViewController.swift; sourceTree = "<group>"; };
 		7633EB2B2064B7A500F9295F /* String+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		7633EB2D2064B88200F9295F /* TestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		7660D3712094779E002494A6 /* PJNavBarPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJNavBarPageViewController.swift; sourceTree = "<group>"; };
 		769882962021F29800DCE264 /* PJCoverPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PJCoverPageViewController.swift; sourceTree = "<group>"; };
 		769882F320274E4500DCE264 /* DemoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoTableViewController.swift; sourceTree = "<group>"; };
 		CA43DC542018BB5600085D8A /* PJPageViewController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PJPageViewController.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,6 +172,7 @@
 				CA4736C5201CA255005A8106 /* PJPageViewController.swift */,
 				769882962021F29800DCE264 /* PJCoverPageViewController.swift */,
 				7633EB1E2063537E00F9295F /* PJTopContentView.swift */,
+				7660D3712094779E002494A6 /* PJNavBarPageViewController.swift */,
 			);
 			path = PJTabBar;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 				CA43DC582018BB5600085D8A /* AppDelegate.swift in Sources */,
 				7633EB1F2063537F00F9295F /* PJTopContentView.swift in Sources */,
 				CA4736C8201CE857005A8106 /* PJPageOptions.swift in Sources */,
+				7660D3722094779E002494A6 /* PJNavBarPageViewController.swift in Sources */,
 				7633EB252063774300F9295F /* DemoSectionTableViewController.swift in Sources */,
 				CA4736BB201B5956005A8106 /* PJTabBarCell.swift in Sources */,
 			);

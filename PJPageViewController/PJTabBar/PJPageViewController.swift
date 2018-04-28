@@ -67,6 +67,8 @@ open class PJPageViewController: UIViewController {
         }
     }
     
+    var pageViewTopConstraint: NSLayoutConstraint?
+    
     open lazy var pageViewController: UIPageViewController = {
         let viewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         viewController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -181,10 +183,12 @@ public extension PJPageViewController {
         self.pageViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.pageViewController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         if #available(iOS 11.0, *) {
-            self.pageViewController.view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: self.tabBarViewHeigth).isActive = true
+            self.pageViewTopConstraint = self.pageViewController.view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: self.tabBarViewHeigth)
+                self.pageViewTopConstraint?.isActive = true
             self.pageViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         } else {
-            self.pageViewController.view.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: self.tabBarViewHeigth).isActive = true
+            self.pageViewTopConstraint = self.pageViewController.view.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: self.tabBarViewHeigth)
+                self.pageViewTopConstraint?.isActive = true
             self.pageViewController.view.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.bottomAnchor).isActive = true
         }
         
