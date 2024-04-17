@@ -30,8 +30,6 @@ public struct PJPageOptions {
     
     public var isTabBarCellLinkScrollWhenMoveScrollBar = true
     
-    public var minimumInteritemSpacing: CGFloat = 60.0
-    
     public var moveScrollBarStyle: MoveScrollBarStyle = .bounce
     
     public var isScrollBarLinkScrollWhenMovePage = true
@@ -41,10 +39,20 @@ public struct PJPageOptions {
     
     public var sectionInset: UIEdgeInsets = .zero
     
-    // tabBar left Padding
+    public var minimumInteritemSpacing: CGFloat = 10
+    
+    // Set the item to the center and the 'sectionInset', 'minimumInteritemSpacing' will not work.
+    public var isAlignmentCenter = false
+    
+    // The 'alignmentCenterMinimumLineSpacing' has a higher priority than 'alignmentCenterSectionLeftAndRightInset' when set isAlignmentCenter = true.
+    public var alignmentCenterMinimumLineSpacing: CGFloat = 0
+    
+    public var alignmentCenterSectionLeftAndRightInset: CGFloat = 0
+    
+    // tabBar title left Padding
     public var leftPadding: CGFloat = 0.0
     
-    // tabBar right Padding
+    // tabBar title right Padding
     public var rightPadding: CGFloat = 0.0
     
     // tabBar left custom view frame
@@ -65,7 +73,9 @@ public struct PJPageOptions {
     
     public var titleSelectedAlpha: CGFloat = 1.0
     
-    public var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: UIFont.Weight.medium)
+    public var titleFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: .medium)
+    
+    public var titleSelectedFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: .medium)
     
     //Temporary dissupport
 //    public var titleTextAlignment: NSTextAlignment = .center
@@ -74,7 +84,7 @@ public struct PJPageOptions {
     
     public var minItemWidth: CGFloat = 0.0
     
-    public var scrollPosition: UICollectionViewScrollPosition = .centeredHorizontally
+    public var scrollPosition: UICollectionView.ScrollPosition = .centeredHorizontally
     
     public var animationDuration: TimeInterval = 0.3
     
@@ -87,4 +97,10 @@ public struct PJPageOptions {
     
     // is set title's gradient when move scrollBar
     public var isTitleGradient = true
+    
+    public var alwaysBounceHorizontal = true
+    
+    public init() {
+        
+    }
 }

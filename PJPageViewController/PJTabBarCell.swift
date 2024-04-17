@@ -9,9 +9,7 @@
 import UIKit
 
 open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
-    
     private var titleLeadingAnchor: NSLayoutConstraint?
-    
     private var titleTrailingAnchor: NSLayoutConstraint?
     
     open lazy var titleLabel: UILabel = {
@@ -46,7 +44,6 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
 }
 
 public extension PJTabBarCell {
-    
     private func initView() {
         self.backgroundColor = .red
         self.contentView.addSubview(self.titleLabel)
@@ -58,7 +55,7 @@ public extension PJTabBarCell {
         self.titleTrailingAnchor?.isActive = true
     }
     
-    public func updateTitle() {
+    func updateTitle() {
         titleLabel.font = self.pjTabBarItem.tabBarOptions.titleFont
         titleLabel.text = pjTabBarItem.title
         self.titleLeadingAnchor?.constant = self.pjTabBarItem.tabBarOptions.leftPadding
@@ -66,8 +63,9 @@ public extension PJTabBarCell {
         self.layoutIfNeeded()
     }
     
-    public func setSelected(selected: Bool) {
+    func setSelected(selected: Bool) {
         if selected {
+            titleLabel.font = self.pjTabBarItem.tabBarOptions.titleSelectedFont
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleSelectedColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleSelectedAlpha
             if self.pjTabBarItem.tabBarOptions.cellSelectedColor != .clear {
@@ -75,6 +73,7 @@ public extension PJTabBarCell {
             }
         }
         else {
+            titleLabel.font = self.pjTabBarItem.tabBarOptions.titleFont
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleAlpha
             if self.pjTabBarItem.tabBarOptions.cellColor != .clear {

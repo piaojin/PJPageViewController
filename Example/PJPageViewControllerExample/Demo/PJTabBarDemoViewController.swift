@@ -7,9 +7,10 @@
 //
 
 import UIKit
+import PJPageViewController
 
 class PJTabBarDemoViewController: UIViewController {
-
+    
     lazy var pageViewController: PJPageViewController = {
         let viewController1 = TestViewController()
         viewController1.title = "viewController1"
@@ -20,11 +21,11 @@ class PJTabBarDemoViewController: UIViewController {
         viewController2.view.backgroundColor = .red
         
         let viewController3 = DemoTableViewController()
-        viewController3.title = "viewController3$"
+        viewController3.title = "订单详情"
         viewController3.view.backgroundColor = .yellow
         
         let viewController4 = DemoTableViewController()
-        viewController4.title = "viewController4"
+        viewController4.title = "商品详情"
         viewController4.view.backgroundColor = .black
         
         let sectionTableViewController = DemoSectionTableViewController()
@@ -39,18 +40,25 @@ class PJTabBarDemoViewController: UIViewController {
 //        tabBarViewConfiguration.rightPadding = 10.0
 //        tabBarViewConfiguration.scrollBarExtraWidth = 20.0
 //        tabBarViewConfiguration.scrollBarConstWidth = 130.0
-        tabBarViewConfiguration.scrollBarColor = .green
+        tabBarViewConfiguration.scrollBarColor = .systemBlue
 //        tabBarViewConfiguration.maxItemWidth = 100.0
-        tabBarViewConfiguration.scrollBarHeigth = 6.0
+        tabBarViewConfiguration.scrollBarHeigth = 3.0
+        tabBarViewConfiguration.scrollBarConstWidth = 30
         tabBarViewConfiguration.titleColor = .red
         tabBarViewConfiguration.titleSelectedColor = .blue
         tabBarViewConfiguration.autoSetMinimumInteritemSpacingMaxCount = 3
-        tabBarViewConfiguration.isAutoSetMinimumInteritemSpacing = true
+        tabBarViewConfiguration.minimumInteritemSpacing = 30
+        tabBarViewConfiguration.isAutoSetMinimumInteritemSpacing = false
+        tabBarViewConfiguration.isAlignmentCenter = true
+        tabBarViewConfiguration.alignmentCenterMinimumLineSpacing = 30
+        tabBarViewConfiguration.alignmentCenterSectionLeftAndRightInset = 30
+        tabBarViewConfiguration.sectionInset = UIEdgeInsets(top: 0, left: 60, bottom: 0, right: 60)
 //        tabBarViewConfiguration.leftViewAnchors = (left: 0.0, top: 0.0, bottom: 0.0, width: 20.0)
 //        tabBarViewConfiguration.rightViewAnchors = (right: 0.0, top: 0.0, bottom: 0.0, width: 20.0)
 //        tabBarViewConfiguration.sectionInset = UIEdgeInsets(top: 0.0, left: 100.0, bottom: 0.0, right: 100.0)
 //        tabBarViewConfiguration.minimumInteritemSpacing = 200.0
 //        tabBarViewConfiguration.itemSize = CGSize(width: 80.0, height: 30.0)
+        tabBarViewConfiguration.titleSelectedFont = UIFont.systemFont(ofSize: 16.0, weight: .bold)
         
         let viewController5 = TestViewController()
         viewController5.title = "viewController5"
@@ -64,24 +72,25 @@ class PJTabBarDemoViewController: UIViewController {
         viewController7.title = "viewController7"
         viewController7.view.backgroundColor = .orange
         
-//        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
-//        viewController.tabBarViewHeigth = 30.0
-//        let leftView = UIView()
-//        leftView.backgroundColor = .orange
-//        let rightView = UIView()
-//        rightView.backgroundColor = .yellow
-//        viewController.tabBarLeftView = leftView
-//        viewController.tabBarRightView = rightView
+        let viewController = PJCoverPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7], coverView: coverView, coverPageViewScrollType: .linkageScroll, tabBarViewConfiguration: tabBarViewConfiguration)
+        viewController.tabBarViewHeigth = 30.0
+        let leftView = UIView()
+        leftView.backgroundColor = .orange
+        let rightView = UIView()
+        rightView.backgroundColor = .yellow
+        viewController.tabBarLeftView = leftView
+        viewController.tabBarRightView = rightView
         
         //不带coverView
 //        let viewController = PJPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1], tabBarOptions: tabBarViewConfiguration)
 //        viewController.tabBarViewHeigth = 30.0
 //        viewController.currentIndex = 3
         
-        let viewController = PJNavBarPageViewController(viewControllers: [viewController3, sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7])
-        viewController.tabBarViewHeigth = 30.0
-        viewController.isTabBarHeightEqualToNavBar = false
+//        let viewController = PJNavBarPageViewController(viewControllers: [viewController3, viewController4, viewController5/*sectionTableViewController, viewController4, viewController2, viewController1, viewController5, viewController6, viewController7*/], tabBarOptions: tabBarViewConfiguration)
+//        viewController.tabBarViewHeigth = 30.0
+//        viewController.isTabBarHeightEqualToNavBar = false
         
+        viewController.title = "测试"
         return viewController
     }()
     
@@ -113,6 +122,7 @@ extension PJTabBarDemoViewController {
     
     @objc func clickAction() {
         let nav = UINavigationController(rootViewController: self.pageViewController)
+        nav.modalPresentationStyle = .fullScreen
         self.present(nav, animated: true, completion: nil)
     }
 }

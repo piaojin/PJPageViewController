@@ -135,7 +135,7 @@ public extension PJCoverPageViewController {
         self.topContentView.addSubview(self.coverView)
         
         self.tabBarView.frame = CGRect(x: 0.0, y: self.coverView.frame.maxY, width: self.view.frame.size.width, height: self.tabBarViewHeigth)
-        self.view.bringSubview(toFront: self.tabBarView)
+        self.view.bringSubviewToFront(self.tabBarView)
     }
     
     private func initCoverData() {
@@ -198,7 +198,7 @@ public extension PJCoverPageViewController {
 
 // MARK: PJTabBarViewDelegate
 public extension PJCoverPageViewController {
-    override public func pjTabBarWillChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int) {
+    override func pjTabBarWillChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int) {
         super.pjTabBarWillChange(pjTabBarView, fromIndex: fromIndex, toIndex: toIndex)
         let toViewController = self.viewControllers[toIndex]
         if toViewController is PJCoverPageViewProtocol, let coverPageViewProtocol = toViewController as? PJCoverPageViewProtocol, let scrollView = coverPageViewProtocol.scrollView() {

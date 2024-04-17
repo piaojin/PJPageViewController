@@ -176,8 +176,8 @@ public extension PJPageViewController {
     private func initView() {
         self.view.backgroundColor = .white
         self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        self.addChildViewController(self.pageViewController)
-        self.pageViewController.didMove(toParentViewController: self)
+        self.addChild(self.pageViewController)
+        self.pageViewController.didMove(toParent: self)
         self.view.addSubview(self.pageViewController.view)
         
         self.pageViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
@@ -386,7 +386,7 @@ extension PJPageViewController: PJTabBarViewDelegate {
     public func pjTabBarDidChange(_ pjTabBarView: PJTabBarView, fromIndex: Int, toIndex: Int) {
         self.currentIndex = toIndex
         let viewController = viewControllers[toIndex]
-        var pageViewControllerNavigationDirection: UIPageViewControllerNavigationDirection = .forward
+        var pageViewControllerNavigationDirection: UIPageViewController.NavigationDirection = .forward
         if fromIndex > toIndex {
             pageViewControllerNavigationDirection = .reverse
         }

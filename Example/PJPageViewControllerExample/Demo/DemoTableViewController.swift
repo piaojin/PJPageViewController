@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PJPageViewController
 
 class DemoTableViewController: UIViewController, PJCoverPageViewProtocol {
     

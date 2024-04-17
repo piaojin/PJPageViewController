@@ -1,0 +1,25 @@
+PODS:
+  - LookinServer (1.2.7):
+    - LookinServer/Core (= 1.2.7)
+  - LookinServer/Core (1.2.7)
+  - PJPageViewController (1.0.0)
+
+DEPENDENCIES:
+  - LookinServer
+  - PJPageViewController (from `../../PJPageViewController`)
+
+SPEC REPOS:
+  trunk:
+    - LookinServer
+
+EXTERNAL SOURCES:
+  PJPageViewController:
+    :path: "../../PJPageViewController"
+
+SPEC CHECKSUMS:
+  LookinServer: 36f1a0ad280de34b9794cf8825867fcc2dd93e75
+  PJPageViewController: 090f0d6777eb2718b46389e7d9540a0c7346ca79
+
+PODFILE CHECKSUM: 13c965b570f7210b3ef684555fcfce9a42ae4d42
+
+COCOAPODS: 1.12.1
