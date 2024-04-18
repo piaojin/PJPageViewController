@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "PJPageViewController"
-  s.version      = "1.0.1"
+  s.version      = "1.0.2"
   s.summary      = "A page viewcontroller with tabbar."
 
   # This description is used to generate tags and improve search results.
