@@ -595,7 +595,7 @@ public extension PJTabBarView {
         }
         
         if let oldSelectCell = cells.first as? PJTabBarCell {
-            oldSelectCell.setSelected(selected: false)
+            oldSelectCell.setSelected(isSelected: false)
         }
         
         //select new cell
@@ -605,7 +605,7 @@ public extension PJTabBarView {
         }
         
         if let newSelectCell = cells.last as? PJTabBarCell {
-            newSelectCell.setSelected(selected: true)
+            newSelectCell.setSelected(isSelected: true)
         }
         
         collectionView.reloadItems(at: [oldIndexPath, newIndexPath])

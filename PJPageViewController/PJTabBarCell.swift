@@ -16,21 +16,20 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
-        label.backgroundColor = .black
         return label
     }()
     
     open var pjTabBarItem: PJTabBarItem = PJTabBarItem(title: "") {
         didSet {
             self.updateTitle()
-            self.setSelected(selected: pjTabBarItem.isSelect)
+            self.setSelected(isSelected: pjTabBarItem.isSelect)
         }
     }
     
     override open func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        self.setSelected(selected: false)
+        self.setSelected(isSelected: false)
     }
     
     override init(frame: CGRect) {
@@ -45,7 +44,7 @@ open class PJTabBarCell: UICollectionViewCell, PJTabBarViewCellProtocol {
 
 public extension PJTabBarCell {
     private func initView() {
-        self.backgroundColor = .red
+        self.backgroundColor = .white
         self.contentView.addSubview(self.titleLabel)
         self.titleLabel.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
         self.titleLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
@@ -56,23 +55,22 @@ public extension PJTabBarCell {
     }
     
     func updateTitle() {
-        titleLabel.font = self.pjTabBarItem.tabBarOptions.titleFont
         titleLabel.text = pjTabBarItem.title
         self.titleLeadingAnchor?.constant = self.pjTabBarItem.tabBarOptions.leftPadding
         self.titleTrailingAnchor?.constant = -self.pjTabBarItem.tabBarOptions.rightPadding
+        setSelected(isSelected: pjTabBarItem.isSelect)
         self.layoutIfNeeded()
     }
     
-    func setSelected(selected: Bool) {
-        if selected {
+    func setSelected(isSelected: Bool) {
+        if isSelected {
             titleLabel.font = self.pjTabBarItem.tabBarOptions.titleSelectedFont
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleSelectedColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleSelectedAlpha
             if self.pjTabBarItem.tabBarOptions.cellSelectedColor != .clear {
                 self.backgroundColor = self.pjTabBarItem.tabBarOptions.cellSelectedColor
             }
-        }
-        else {
+        } else {
             titleLabel.font = self.pjTabBarItem.tabBarOptions.titleFont
             titleLabel.textColor = self.pjTabBarItem.tabBarOptions.titleColor
             titleLabel.alpha = self.pjTabBarItem.tabBarOptions.titleAlpha
