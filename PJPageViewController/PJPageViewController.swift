@@ -72,8 +72,6 @@ open class PJPageViewController: UIViewController {
     open lazy var pageViewController: UIPageViewController = {
         let viewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         viewController.view.translatesAutoresizingMaskIntoConstraints = false
-        viewController.delegate = self
-        viewController.dataSource = self
         return viewController
     }()
     
@@ -81,7 +79,6 @@ open class PJPageViewController: UIViewController {
         let bar = PJTabBarView(tabBarOptions: self.tabBarOptions)
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
-        bar.delegate = self
         return bar
     }()
     
@@ -172,20 +169,18 @@ open class PJPageViewController: UIViewController {
         self.addChild(self.pageViewController)
         self.pageViewController.didMove(toParent: self)
         self.view.addSubview(self.pageViewController.view)
+        self.view.addSubview(self.topContentView)
         
         self.pageViewController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.pageViewController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        self.pageViewTopConstraint = self.pageViewController.view.topAnchor.constraint(equalTo: self.topContentView.bottomAnchor)
+        self.pageViewTopConstraint?.isActive = true
         if #available(iOS 11.0, *) {
-            self.pageViewTopConstraint = self.pageViewController.view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: self.tabBarViewHeigth)
-                self.pageViewTopConstraint?.isActive = true
             self.pageViewController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         } else {
-            self.pageViewTopConstraint = self.pageViewController.view.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: self.tabBarViewHeigth)
-                self.pageViewTopConstraint?.isActive = true
             self.pageViewController.view.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.bottomAnchor).isActive = true
         }
         
-        self.view.addSubview(self.topContentView)
         self.topContentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         self.topContentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.topContentViewHeight = self.topContentView.heightAnchor.constraint(equalToConstant: self.tabBarViewHeigth)
@@ -202,6 +197,9 @@ open class PJPageViewController: UIViewController {
     }
     
     open func initData() {
+        tabBarView.delegate = self
+        pageViewController.delegate = self
+        pageViewController.dataSource = self
         let firstShowViewController = viewControllers[self.currentIndex]
         self.pageViewController.setViewControllers([firstShowViewController], direction: .forward, animated: self.pageAnimated, completion: {
             [weak self] (finished) in
@@ -230,7 +228,6 @@ public extension PJPageViewController {
 
 extension PJPageViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
         if self.scrollBarScrollType != .linkage {
             return
         }
