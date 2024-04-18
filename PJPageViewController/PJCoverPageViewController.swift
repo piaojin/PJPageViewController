@@ -13,7 +13,7 @@ public enum PJCoverPageViewScrollType {
     case linkageScroll
 }
 
-public protocol PJCoverPageViewProtocol: class {
+public protocol PJCoverPageViewProtocol {
     func scrollView() -> UIScrollView?
 }
 
@@ -31,7 +31,11 @@ open class PJCoverPageViewController: PJPageViewController {
     
     private var currentContentOffsetY: CGFloat = 0.0
     
-    open var coverViewHeigth: CGFloat = 60.0
+    open var coverViewHeigth: CGFloat = 60.0 {
+        didSet {
+            topContentViewHeight?.constant = coverViewHeigth + tabBarViewHeigth
+        }
+    }
     
     private var coverViewY: CGFloat {
         get {
@@ -41,7 +45,7 @@ open class PJCoverPageViewController: PJPageViewController {
         }
     }
     
-    open var coverView: UIView!
+    open var coverView: UIView = UIView()
     
     convenience public init(viewControllers: [UIViewController], coverView: UIView, coverPageViewScrollType: PJCoverPageViewScrollType = .linkageScroll) {
         self.init(viewControllers: viewControllers, coverView: coverView, coverPageViewScrollType: coverPageViewScrollType, tabBarViewConfiguration: PJPageOptions())
@@ -72,10 +76,6 @@ open class PJCoverPageViewController: PJPageViewController {
         self.view.backgroundColor = .white
         self.initCoverView()
         self.initCoverData()
-    }
-
-    override open func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
     }
     
     override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -122,13 +122,7 @@ open class PJCoverPageViewController: PJPageViewController {
         }
     }
     
-    deinit {
-        self.removeObserver(self, forKeyPath: PJCoverPageViewController.kScrollViewKeyPath)
-    }
-}
-
-public extension PJCoverPageViewController {
-    private func initCoverView() {
+    open func initCoverView() {
         self.topContentViewHeight?.constant = self.coverViewHeigth + self.tabBarViewHeigth
         self.coverView.translatesAutoresizingMaskIntoConstraints = true
         self.coverView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.size.width, height: self.coverViewHeigth)
@@ -138,7 +132,7 @@ public extension PJCoverPageViewController {
         self.view.bringSubviewToFront(self.tabBarView)
     }
     
-    private func initCoverData() {
+    open func initCoverData() {
         if self.coverPageViewScrollType == .forbiddenScroll {
             if let first = viewControllers.first {
                 self.pageViewController.setViewControllers([first], direction: .forward, animated: true, completion: nil)
@@ -148,6 +142,12 @@ public extension PJCoverPageViewController {
         self.currentContentOffsetY = -self.coverView.frame.size.height
     }
     
+    deinit {
+        self.removeObserver(self, forKeyPath: PJCoverPageViewController.kScrollViewKeyPath)
+    }
+}
+
+public extension PJCoverPageViewController {
     private func addSubScrollViewObserver() {
         for index in 0..<self.viewControllers.count {
             let viewController = self.viewControllers[index]

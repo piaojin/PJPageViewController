@@ -160,20 +160,13 @@ open class PJPageViewController: UIViewController {
         self.syncScrollView()
         self.initData()
     }
-    
-    override open func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
 
     override open func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         self.tabBarView.frame = CGRect(x: 0.0, y: 0.0, width: size.width, height: self.tabBarView.frame.size.height)
     }
-}
-
-public extension PJPageViewController {
     
-    private func initView() {
+    open func initView() {
         self.view.backgroundColor = .white
         self.pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
         self.addChild(self.pageViewController)
@@ -208,7 +201,7 @@ public extension PJPageViewController {
         self.topContentView.addSubview(self.tabBarView)
     }
     
-    private func initData() {
+    open func initData() {
         let firstShowViewController = viewControllers[self.currentIndex]
         self.pageViewController.setViewControllers([firstShowViewController], direction: .forward, animated: self.pageAnimated, completion: {
             [weak self] (finished) in
@@ -218,8 +211,10 @@ public extension PJPageViewController {
             }
         })
     }
-    
-    public func syncScrollView() {
+}
+
+public extension PJPageViewController {
+    func syncScrollView() {
         for view in self.pageViewController.view.subviews {
             if view is UIScrollView, let tempView = view as? UIScrollView {
                 self.pageScrollView = tempView
@@ -318,7 +313,7 @@ extension PJPageViewController: UIPageViewControllerDataSource {
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         
-        guard let index =  self.viewControllers.index(of: viewController), index > 0, index != NSNotFound else {
+        guard let index =  self.viewControllers.firstIndex(of: viewController), index > 0, index != NSNotFound else {
             return nil
         }
         
@@ -328,7 +323,7 @@ extension PJPageViewController: UIPageViewControllerDataSource {
     }
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let index =  self.viewControllers.index(of: viewController), index < self.viewControllers.count - 1, index != NSNotFound else {
+        guard let index =  self.viewControllers.firstIndex(of: viewController), index < self.viewControllers.count - 1, index != NSNotFound else {
             return nil
         }
         

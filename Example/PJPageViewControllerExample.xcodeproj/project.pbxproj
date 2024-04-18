@@ -10,6 +10,7 @@
 		7633EB252063774300F9295F /* DemoSectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7633EB242063774300F9295F /* DemoSectionTableViewController.swift */; };
 		7633EB2E2064B88200F9295F /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7633EB2D2064B88200F9295F /* TestViewController.swift */; };
 		769882F420274E4500DCE264 /* DemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 769882F320274E4500DCE264 /* DemoTableViewController.swift */; };
+		81ABDD9D2BD0A91B00598B01 /* PurchasePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81ABDD9C2BD0A91B00598B01 /* PurchasePageViewController.swift */; };
 		CA43DC582018BB5600085D8A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA43DC572018BB5600085D8A /* AppDelegate.swift */; };
 		CA43DC5A2018BB5600085D8A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA43DC592018BB5600085D8A /* ViewController.swift */; };
 		CA43DC5D2018BB5600085D8A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA43DC5B2018BB5600085D8A /* Main.storyboard */; };
@@ -23,6 +24,7 @@
 		7633EB242063774300F9295F /* DemoSectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSectionTableViewController.swift; sourceTree = "<group>"; };
 		7633EB2D2064B88200F9295F /* TestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		769882F320274E4500DCE264 /* DemoTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoTableViewController.swift; sourceTree = "<group>"; };
+		81ABDD9C2BD0A91B00598B01 /* PurchasePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasePageViewController.swift; sourceTree = "<group>"; };
 		8457037AB9FD17F27FB66EE3 /* Pods-PJPageViewControllerExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PJPageViewControllerExample.release.xcconfig"; path = "Target Support Files/Pods-PJPageViewControllerExample/Pods-PJPageViewControllerExample.release.xcconfig"; sourceTree = "<group>"; };
 		96F94368C497F28B3AF450B2 /* Pods_PJPageViewControllerExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PJPageViewControllerExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEE18C34FBF3D216954F2FA7 /* Pods-PJPageViewController.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PJPageViewController.debug.xcconfig"; path = "Target Support Files/Pods-PJPageViewController/Pods-PJPageViewController.debug.xcconfig"; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				CA4736C3201B65AF005A8106 /* PJTabBarDemoViewController.swift */,
 				769882F320274E4500DCE264 /* DemoTableViewController.swift */,
 				7633EB242063774300F9295F /* DemoSectionTableViewController.swift */,
+				81ABDD9C2BD0A91B00598B01 /* PurchasePageViewController.swift */,
 			);
 			path = Demo;
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 				7633EB2E2064B88200F9295F /* TestViewController.swift in Sources */,
 				CA4736C4201B65AF005A8106 /* PJTabBarDemoViewController.swift in Sources */,
 				CA43DC5A2018BB5600085D8A /* ViewController.swift in Sources */,
+				81ABDD9D2BD0A91B00598B01 /* PurchasePageViewController.swift in Sources */,
 				769882F420274E4500DCE264 /* DemoTableViewController.swift in Sources */,
 				CA43DC582018BB5600085D8A /* AppDelegate.swift in Sources */,
 				7633EB252063774300F9295F /* DemoSectionTableViewController.swift in Sources */,
