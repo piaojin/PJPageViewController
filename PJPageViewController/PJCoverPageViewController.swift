@@ -23,9 +23,21 @@ open class PJCoverPageViewController: PJPageViewController {
     
     private static let kScrollViewKeyPath = "contentOffset"
     
-    open var coverPageViewScrollType: PJCoverPageViewScrollType = .forbiddenScroll
+    open var coverPageViewScrollType: PJCoverPageViewScrollType = .forbiddenScroll {
+        didSet {
+            if coverPageViewScrollType == .linkageScroll {
+                if !hasAddScrollViewObserver {
+                    addSubScrollViewObserver()
+                }
+            } else {
+                removeSubScrollViewObserver()
+            }
+        }
+    }
     
     private var subViewControllerScrollViews: [UIViewController : UIScrollView] = [:]
+    
+    private var hasAddScrollViewObserver = false;
     
     open var coverViewHeigth: CGFloat = 60.0 {
         didSet {
@@ -127,17 +139,22 @@ open class PJCoverPageViewController: PJPageViewController {
             if let first = viewControllers.first {
                 self.pageViewController.setViewControllers([first], direction: .forward, animated: true, completion: nil)
             }
+        } else {
+            addSubScrollViewObserver()
         }
-        self.addSubScrollViewObserver()
     }
     
     deinit {
-        self.removeObserver(self, forKeyPath: PJCoverPageViewController.kScrollViewKeyPath)
+        removeSubScrollViewObserver()
     }
 }
 
 public extension PJCoverPageViewController {
     private func addSubScrollViewObserver() {
+        if hasAddScrollViewObserver {
+            return
+        }
+        
         for index in 0..<self.viewControllers.count {
             let viewController = self.viewControllers[index]
             if viewController is PJCoverPageViewProtocol, let coverPageViewProtocol = viewController as? PJCoverPageViewProtocol, let scrollView = coverPageViewProtocol.scrollView() {
@@ -149,13 +166,25 @@ public extension PJCoverPageViewController {
                 scrollView.pj_scrollViewIndex = index
                 if self.coverPageViewScrollType == .linkageScroll {
                     scrollView.addObserver(self, forKeyPath: PJCoverPageViewController.kScrollViewKeyPath, options: [.new, .old], context: &self.kScrollViewConText)
+                    hasAddScrollViewObserver = true
+                }
+            }
+        }
+    }
+    
+    private func removeSubScrollViewObserver() {
+        if hasAddScrollViewObserver {
+            for index in 0..<self.viewControllers.count {
+                let viewController = self.viewControllers[index]
+                if viewController is PJCoverPageViewProtocol, let coverPageViewProtocol = viewController as? PJCoverPageViewProtocol, let scrollView = coverPageViewProtocol.scrollView() {
+                    scrollView.removeObserver(self, forKeyPath: PJCoverPageViewController.kScrollViewKeyPath)
                 }
             }
         }
     }
     
     private func updateCoverViewTarBabFrame(height: CGFloat) {
-        var height = max(height, 0)
+        let height = max(height, 0)
         if self.coverView.frame.size.height != height {
             self.coverView.frame.size.height = height
             self.tabBarView.frame.origin.y = self.coverView.frame.maxY

@@ -2,7 +2,7 @@ PODS:
   - LookinServer (1.2.7):
     - LookinServer/Core (= 1.2.7)
   - LookinServer/Core (1.2.7)
-  - PJPageViewController (1.0.2)
+  - PJPageViewController (1.0.3)
 
 DEPENDENCIES:
   - LookinServer
@@ -18,7 +18,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   LookinServer: 36f1a0ad280de34b9794cf8825867fcc2dd93e75
-  PJPageViewController: 61c3cfec8b218d1e0c1443571e14585121b4ac32
+  PJPageViewController: c25a9618146e6cd48353f07f298b51fdba02fa8b
 
 PODFILE CHECKSUM: 13c965b570f7210b3ef684555fcfce9a42ae4d42
 
