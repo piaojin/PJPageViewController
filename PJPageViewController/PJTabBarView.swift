@@ -40,6 +40,9 @@ open class PJTabBarView: UIView {
     
     open var clickCellClosure: ((PJTabBarView, Int) -> ())?
     
+    /// Will update PJPageOptions when set PJPageOptions.isAlignmentCenter = true.
+    open var didUpdatePageOptions: ((PJPageOptions) -> Void)?
+    
     open var items: [Int: PJTabBarItem] = [:]
     
     open var tabBarOptions: PJPageOptions = PJPageOptions()
@@ -403,6 +406,10 @@ open class PJTabBarView: UIView {
         flowLayout.minimumInteritemSpacing = flowLayout.minimumLineSpacing
         sectionLeftAndRightInset = max(sectionLeftAndRightInset, 0)
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: sectionLeftAndRightInset, bottom: 0, right: sectionLeftAndRightInset)
+        // Note: Need to update tabBarOptions
+        tabBarOptions.minimumInteritemSpacing = flowLayout.minimumLineSpacing
+        tabBarOptions.sectionInset = flowLayout.sectionInset
+        didUpdatePageOptions?(tabBarOptions)
     }
     
     private func addLeftAndRightView() {
@@ -794,7 +801,6 @@ public extension PJTabBarView {
             }
             
             self.scrollBar.frame = CGRect(x: progressX, y: self.scrollBar.frame.origin.y, width: scrollBarWidth, height: self.tabBarOptions.scrollBarHeigth)
-            break
         case .elastic:
             let toFrameCenterX = toFrame.origin.x + self.tabBarOptions.leftPadding + (toFrame.size.width - self.tabBarOptions.leftPadding - self.tabBarOptions.rightPadding) / 2.0
             
@@ -811,7 +817,6 @@ public extension PJTabBarView {
                 scrollBarWidth = fromTitleWidth + (toTitleWidth - fromTitleWidth) * progressPercentage + self.tabBarOptions.scrollBarExtraWidth
             }
             self.scrollBar.frame.size.width = scrollBarWidth
-            break
         }
 
     }

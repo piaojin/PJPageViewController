@@ -79,6 +79,13 @@ open class PJPageViewController: UIViewController {
         let bar = PJTabBarView(tabBarOptions: self.tabBarOptions)
         bar.translatesAutoresizingMaskIntoConstraints = true
         bar.isUserInteractionEnabled = true
+        bar.didUpdatePageOptions = { [weak self] updatedTabBarOptions in
+            // PJTabBarView updates tabBarOptions by setting isAlignmentCenter = true
+            if updatedTabBarOptions.isAlignmentCenter {
+                self?.tabBarOptions.minimumInteritemSpacing = updatedTabBarOptions.minimumInteritemSpacing
+                self?.tabBarOptions.sectionInset = updatedTabBarOptions.sectionInset
+            }
+        }
         return bar
     }()
     
@@ -277,7 +284,7 @@ extension PJPageViewController: UIScrollViewDelegate {
         
         let floadIndex = offsetX / self.pageWidth
         let floorIndex = floor(floadIndex)
-        if floorIndex < 0 || floorIndex >= CGFloat(self.viewControllerCount) || floadIndex > CGFloat(self.viewControllerCount - 1) {
+        if floorIndex < 0 || floorIndex >= CGFloat(self.viewControllerCount) {
             return (-1, -1, 0.0)
         }
         var progress = offsetX / self.pageWidth - floorIndex
